@@ -70,7 +70,6 @@ public class Database extends ListenerAdapter {
         //server config
         Document document = new Document("serverId", Id)
                 .append("users", "")
-                .append("sendMessage",  0.0)
                 .append("actionChannel", "0")
                 .append("roleToMention", "0")
                 .append("mainChat", "0");

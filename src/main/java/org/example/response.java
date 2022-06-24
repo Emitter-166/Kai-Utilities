@@ -11,57 +11,25 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class response extends ListenerAdapter {
     boolean hasSent = false;
 
+
     public void onMessageReceived(MessageReceivedEvent e) {
-
-
         String Time = ZonedDateTime.now(ZoneId.of("America/New_York"))
-                .format(DateTimeFormatter.ISO_LOCAL_TIME) + "(UTC)";
-
-        List<Double> messages = new ArrayList<>();
-        Map<Double, String> reverseUser = new HashMap<>();
-        StringBuilder winnersBuilder = new StringBuilder();
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
+                .format(DateTimeFormatter.ISO_LOCAL_TIME) + "(EST)";
 
 
-            }
-        });
-        try {
-            Arrays.stream(Database.get(e.getGuild().getId()).get("users").toString().split(" ")).forEach(userId -> {
-                double counted;
-                try {
-                    counted = (double) Database.getUser(userId, "counted");
-                } catch (InterruptedException ex) {
-                    throw new RuntimeException(ex);
-                }
-                messages.add(counted);
-                reverseUser.put(counted, userId);
-            });
-        } catch (InterruptedException ex) {
-            throw new RuntimeException(ex);
-        }
-
-        try {
-            for (int i = 2, j = 0; i > 0; i--, j++) {
-                if (i == 0) break;
-                String winnerAsMention = e.getGuild().retrieveMemberById(reverseUser.get(messages.stream().sorted().collect(Collectors.toList()).get(i - 1)))
-                        .complete().getAsMention();
-                String amountOfMessages = String.valueOf(Math.floor(messages.stream().sorted().collect(Collectors.toList()).get(i - 1)));
-                winnersBuilder.append(String.format("%s. %s - %s messages \n", j + 1, winnerAsMention, amountOfMessages));
-            }
-        } catch (IndexOutOfBoundsException exception) {
-            exception.printStackTrace();
-        }
+        CountDownLatch latch = new CountDownLatch(1);
+        leaderBoardThread leaderboardThread = new leaderBoardThread(e, Time, latch );
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        executorService.submit(leaderboardThread);
 
         String args[] = e.getMessage().getContentRaw().split(" ");
-
         switch (args[0]) {
 
             case ".help":
@@ -90,9 +58,14 @@ public class response extends ListenerAdapter {
                 break;
 
             case ".leaderboard":
+                try {
+                    latch.await();
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
                 EmbedBuilder leaderboard = new EmbedBuilder()
                         .setTitle("Leaderboard for today: ")
-                        .setDescription(winnersBuilder.toString())
+                        .setDescription(leaderboardThread.getWinnersBuilder().toString())
                         .setFooter(Time)
                         .setColor(Color.WHITE);
                 e.getMessage().replyEmbeds(leaderboard.build())
@@ -149,18 +122,24 @@ public class response extends ListenerAdapter {
         }
 
         //summary of the day
-        String[] timeArgs = Time.split(":");
+        String[] timeArgs = {"00"};
+                //Time.split(":");
         if (!hasSent) {
             if (timeArgs[0].equalsIgnoreCase("00")) {
+                try {
+                    latch.await();
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
                 EmbedBuilder leaderboard = new EmbedBuilder()
                         .setTitle("Summary of today: ")
-                        .setDescription(winnersBuilder.toString())
+                        .setDescription(leaderboardThread.getWinnersBuilder().toString())
                         .setFooter(Time)
                         .setColor(Color.WHITE);
                 try {
                     String mentionRoleId = (String) Database.get(e.getGuild().getId()).get("roleToMention");
                     e.getGuild().getTextChannelById((String) Database.get(e.getGuild().getId()).get("actionChannel")).sendMessageEmbeds(leaderboard.build())
-                            .content(String.format("<@%s>", mentionRoleId))
+                            .content(String.format("%s", e.getGuild().getRoleById(mentionRoleId).getAsMention()))
                             .mentionRoles(mentionRoleId)
                             .queue();
                 } catch (InterruptedException ex) {
