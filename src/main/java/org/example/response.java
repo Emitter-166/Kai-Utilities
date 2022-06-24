@@ -122,8 +122,7 @@ public class response extends ListenerAdapter {
         }
 
         //summary of the day
-        String[] timeArgs = {"00"};
-                //Time.split(":");
+        String[] timeArgs = Time.split(":");
         if (!hasSent) {
             if (timeArgs[0].equalsIgnoreCase("00")) {
                 try {
