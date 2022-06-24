@@ -16,14 +16,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class response extends ListenerAdapter {
-    public void onMessageReceived(MessageReceivedEvent e){
-        ZoneId id = ZoneId.of("America/New_York");
-        Date date = new Date();
-        DateFormat dateFormat = new SimpleDateFormat("HH:mm");
-        dateFormat.setTimeZone(TimeZone.getTimeZone(id));
-        String time = dateFormat.format(date);
+    boolean hasSent = false;
+
+    public void onMessageReceived(MessageReceivedEvent e) {
 
 
+        String Time = ZonedDateTime.now(ZoneId.of("America/New_York"))
+                .format(DateTimeFormatter.ISO_LOCAL_TIME) + "(UTC)";
         List<Double> messages = new ArrayList<>();
         Map<Double, String> reverseUser = new HashMap<>();
         StringBuilder winnersBuilder = new StringBuilder();
@@ -42,16 +41,23 @@ public class response extends ListenerAdapter {
             throw new RuntimeException(ex);
         }
 
-        for (int i = 10, j = 0; i == 0; i--, j++) {
-            String winnerAsMention = e.getGuild().retrieveMemberById(reverseUser.get(messages.stream().sorted().collect(Collectors.toList()).get(i)))
-                    .complete().getAsMention();
-            String amountOfMessages = String.valueOf(Math.floor(messages.stream().sorted().collect(Collectors.toList()).get(i)));
-            winnersBuilder.append(String.format("%s. %s - %s messages \n", j + 1, winnerAsMention, amountOfMessages));
+        try {
+            for (int i = 2, j = 0; i > 0; i--, j++) {
+                if (i == 0) break;
+                String winnerAsMention = e.getGuild().retrieveMemberById(reverseUser.get(messages.stream().sorted().collect(Collectors.toList()).get(i - 1)))
+                        .complete().getAsMention();
+                String amountOfMessages = String.valueOf(Math.floor(messages.stream().sorted().collect(Collectors.toList()).get(i - 1)));
+                System.out.println(amountOfMessages);
+                System.out.println(winnerAsMention);
+                winnersBuilder.append(String.format("%s. %s - %s messages \n", j + 1, winnerAsMention, amountOfMessages));
+            }
+        } catch (IndexOutOfBoundsException exception) {
+            exception.printStackTrace();
         }
 
         String args[] = e.getMessage().getContentRaw().split(" ");
 
-        switch (args[0]){
+        switch (args[0]) {
 
             case ".help":
                 EmbedBuilder helpBuilder = new EmbedBuilder()
@@ -64,7 +70,7 @@ public class response extends ListenerAdapter {
                         .mentionRepliedUser(false)
                         .queue();
 
-                if(e.getMember().hasPermission(Permission.ADMINISTRATOR)){
+                if (e.getMember().hasPermission(Permission.ADMINISTRATOR)) {
                     EmbedBuilder setupHelpBuilder = new EmbedBuilder()
                             .setTitle("Help")
                             .setColor(Color.WHITE)
@@ -79,8 +85,6 @@ public class response extends ListenerAdapter {
                 break;
 
             case ".leaderboard":
-                String Time = ZonedDateTime.now(ZoneId.of("America/New_York"))
-                        .format(DateTimeFormatter.ISO_LOCAL_TIME);
                 EmbedBuilder leaderboard = new EmbedBuilder()
                         .setTitle("Leaderboard for today: ")
                         .setDescription(winnersBuilder.toString())
@@ -89,8 +93,74 @@ public class response extends ListenerAdapter {
                 e.getMessage().replyEmbeds(leaderboard.build())
                         .mentionRepliedUser(false)
                         .queue();
+                break;
+
+            case ".mainChat":
+                if (!e.getMember().hasPermission(Permission.ADMINISTRATOR)) return;
+                e.getMessage().reply("`main chat set! messages will be monitored here!`")
+                        .mentionRepliedUser(false)
+                        .queue();
+                Database.set(e.getGuild().getId(), "mainChat", e.getChannel().getId(), false);
+                break;
+
+            case ".actionChannel":
+                if (!e.getMember().hasPermission(Permission.ADMINISTRATOR)) return;
+                e.getMessage().reply("`Action set! Summaries will be sent here!`")
+                        .mentionRepliedUser(false)
+                        .queue();
+                Database.set(e.getGuild().getId(), "actionChannel", e.getChannel().getId(), false);
+                break;
+
+            case ".roleToMention":
+                if (!e.getMember().hasPermission(Permission.ADMINISTRATOR)) return;
+                e.getMessage().reply("`ping roles set! this role will be pinged with the summaries!`")
+                        .mentionRepliedUser(false)
+                        .queue();
+                Database.set(e.getGuild().getId(), "actionChannel", e.getGuild().getRolesByName(args[1], false).get(0).getId(), false);
+                break;
+
+            case ".messages":
+                if (args.length == 1) {
+                    try {
+                        e.getMessage().reply(String.format("You have a total of %s messages today!", Database.getUser(e.getAuthor().getId(), "counted")))
+                                .mentionRepliedUser(false)
+                                .queue();
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                } else {
+                    try {
+                        e.getMessage().reply(String.format("%s have a total of %s messages today!",
+                                        e.getGuild().retrieveMemberById(args[1]).complete().getAsMention(), Database.getUser(args[1], "counted")))
+                                .mentionRepliedUser(false)
+                                .queue();
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+                break;
         }
 
-
+        //summary of the day
+        String[] timeArgs = Time.split(":");
+        if (!hasSent) {
+            if (timeArgs[0].equalsIgnoreCase("00")) {
+                EmbedBuilder leaderboard = new EmbedBuilder()
+                        .setTitle("Summary of today: ")
+                        .setDescription(winnersBuilder.toString())
+                        .setFooter(Time)
+                        .setColor(Color.WHITE);
+                try {
+                    String mentionRoleId = (String) Database.get(e.getGuild().getId()).get("roleToMention");
+                    e.getGuild().getTextChannelById((String) Database.get(e.getGuild().getId()).get("actionChannel")).sendMessageEmbeds(leaderboard.build())
+                            .content(String.format("<@%s>", mentionRoleId))
+                            .mentionRoles(mentionRoleId)
+                            .queue();
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+            hasSent = true;
+        }
     }
 }

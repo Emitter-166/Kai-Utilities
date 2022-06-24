@@ -61,7 +61,7 @@ public class Database extends ListenerAdapter {
         }catch (NoSuchElementException exception){
             setUser(userId, "counted", 0.0, false);
             Thread.sleep(200);
-            return (Long) ((Document) collection.find(new Document("userId", userId)).cursor().next()).get(key);
+            return  ((Document) collection.find(new Document("userId", userId)).cursor().next()).get(key);
         }
 
     }
@@ -97,6 +97,7 @@ public class Database extends ListenerAdapter {
             if(field.equalsIgnoreCase("serverId")){
                 createDB(Id);
             }else{
+                System.out.println("100");
                 createUserDB(Id);
             }
             document = (Document) collection.find(new Document(field, Id)).cursor().next();
@@ -108,8 +109,9 @@ public class Database extends ListenerAdapter {
             collection.updateOne(document, updateKey);
         }else{
             Document Updatedocument;
+
             if(field.equalsIgnoreCase("serverId") ){
-                if(Arrays.stream(document.get(key).toString().split(" ")).anyMatch(users -> users.equalsIgnoreCase((String) value))) {
+                if(Arrays.stream(document.get(key).toString().split(" ")).anyMatch(users -> users.equalsIgnoreCase(((String) value).replace(" ", "")))) {
                     return;
                 }
             }
