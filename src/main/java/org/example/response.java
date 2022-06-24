@@ -4,10 +4,9 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.bson.Document;
 
 import java.awt.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -23,9 +22,17 @@ public class response extends ListenerAdapter {
 
         String Time = ZonedDateTime.now(ZoneId.of("America/New_York"))
                 .format(DateTimeFormatter.ISO_LOCAL_TIME) + "(UTC)";
+
         List<Double> messages = new ArrayList<>();
         Map<Double, String> reverseUser = new HashMap<>();
         StringBuilder winnersBuilder = new StringBuilder();
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+
+            }
+        });
         try {
             Arrays.stream(Database.get(e.getGuild().getId()).get("users").toString().split(" ")).forEach(userId -> {
                 double counted;
@@ -47,8 +54,6 @@ public class response extends ListenerAdapter {
                 String winnerAsMention = e.getGuild().retrieveMemberById(reverseUser.get(messages.stream().sorted().collect(Collectors.toList()).get(i - 1)))
                         .complete().getAsMention();
                 String amountOfMessages = String.valueOf(Math.floor(messages.stream().sorted().collect(Collectors.toList()).get(i - 1)));
-                System.out.println(amountOfMessages);
-                System.out.println(winnerAsMention);
                 winnersBuilder.append(String.format("%s. %s - %s messages \n", j + 1, winnerAsMention, amountOfMessages));
             }
         } catch (IndexOutOfBoundsException exception) {
@@ -116,7 +121,7 @@ public class response extends ListenerAdapter {
                 e.getMessage().reply("`ping roles set! this role will be pinged with the summaries!`")
                         .mentionRepliedUser(false)
                         .queue();
-                Database.set(e.getGuild().getId(), "actionChannel", e.getGuild().getRolesByName(args[1], false).get(0).getId(), false);
+                Database.set(e.getGuild().getId(), "roleToMention", e.getGuild().getRolesByName(args[1], false).get(0).getId(), false);
                 break;
 
             case ".messages":
@@ -130,6 +135,8 @@ public class response extends ListenerAdapter {
                     }
                 } else {
                     try {
+                        System.out.println(args[1]);
+                        System.out.println(args[2]);
                         e.getMessage().reply(String.format("%s have a total of %s messages today!",
                                         e.getGuild().retrieveMemberById(args[1]).complete().getAsMention(), Database.getUser(args[1], "counted")))
                                 .mentionRepliedUser(false)
@@ -156,6 +163,13 @@ public class response extends ListenerAdapter {
                             .content(String.format("<@%s>", mentionRoleId))
                             .mentionRoles(mentionRoleId)
                             .queue();
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+                try {
+                    Arrays.stream(Database.get(e.getGuild().getId()).get("users").toString().split(" ")).forEach(userId ->{
+                        Database.collection.deleteOne(new Document("userId", userId));
+                    });
                 } catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
                 }

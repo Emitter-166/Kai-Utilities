@@ -97,7 +97,6 @@ public class Database extends ListenerAdapter {
             if(field.equalsIgnoreCase("serverId")){
                 createDB(Id);
             }else{
-                System.out.println("100");
                 createUserDB(Id);
             }
             document = (Document) collection.find(new Document(field, Id)).cursor().next();
