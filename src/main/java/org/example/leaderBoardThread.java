@@ -10,7 +10,7 @@ public class leaderBoardThread{
     MessageReceivedEvent e;
     String time;
 
-    public leaderBoardThread(MessageReceivedEvent e, String time) {
+    public leaderBoardThread(MessageReceivedEvent e, String time) throws InterruptedException {
         this.e = e;
         this.time = time;
     }
@@ -24,9 +24,13 @@ public class leaderBoardThread{
         return winnersBuilder;
     }
 
-    StringBuilder winnersBuilder = new StringBuilder();
 
-    public void run() {
+    StringBuilder winnersBuilder;
+
+    public void run() throws InterruptedException {
+        winnersBuilder = new StringBuilder()
+                .append(String.format("**Leader board for <#%s>**", Database.get(e.getGuild().getId()).get("mainChat")))
+                .append(" \n");
 
         try{
             Arrays.stream(Database.get(e.getGuild().getId()).get("users").toString().split(" ")).forEach(userId -> {
@@ -46,7 +50,7 @@ public class leaderBoardThread{
         try {
             for (int i = messages.size(), j = 0; i > 0; i--, j++) {
                 if (i == 0) break;
-                if(j >= 15) break;
+                if(j >= 20) break;
                 String winnerAsMention = String.format("<@%s>",reverseUser.get(messages.stream().sorted().collect(Collectors.toList()).get(i - 1)) );
 
                 String amountOfMessages = String.valueOf(Math.floor(messages.stream().sorted().collect(Collectors.toList()).get(i - 1)));

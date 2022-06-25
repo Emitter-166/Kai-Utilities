@@ -41,7 +41,8 @@ public class response extends ListenerAdapter {
                             .setColor(Color.WHITE)
                             .setDescription("`.actionChannel` **channel to send summary at the end of the day** \n" +
                                     "`.roleToMention roleName(Case sensitive)` **role to mention when sending summary of the day** \n" +
-                                    "`.mainChat` **set chat to monitor messages for**");
+                                    "`.mainChat` **set chat to monitor messages for** \n" +
+                                    "`.clear` **reset leaderboard**");
                     e.getMessage().replyEmbeds(setupHelpBuilder.build())
                             .mentionRepliedUser(false)
                             .queue();
@@ -50,8 +51,17 @@ public class response extends ListenerAdapter {
                 break;
 
             case ".leaderboard":
-                leaderBoardThread leaderboardThread = new leaderBoardThread(e, Time);
-                leaderboardThread.run();
+                leaderBoardThread leaderboardThread = null;
+                try {
+                    leaderboardThread = new leaderBoardThread(e, Time);
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+                try {
+                    leaderboardThread.run();
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
                 EmbedBuilder leaderboard = null;
                 try {
                     leaderboard = new EmbedBuilder()
@@ -111,14 +121,34 @@ public class response extends ListenerAdapter {
                     }
                 }
                 break;
+
+            case ".clear":
+                if(!e.getMember().hasPermission(Permission.ADMINISTRATOR)) return;
+                e.getMessage().reply("Leader board cleared!")
+                        .mentionRepliedUser(false)
+                        .queue();
+                try {
+                    Arrays.stream(Database.get(e.getGuild().getId()).get("users").toString().split(" ")).forEach(userId ->{
+                        Database.collection.deleteOne(new Document("userId", userId));
+                    });
+                    Database.set(e.getGuild().getId(),"users", "", false );
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+                break;
         }
 
         //summary of the day
         String[] timeArgs = Time.split(":");
         if (!hasSent) {
             if (timeArgs[0].equalsIgnoreCase("00")) {
-                leaderBoardThread leaderboardThread = new leaderBoardThread(e, Time);
-                leaderboardThread.run();
+                leaderBoardThread leaderboardThread = null;
+                try {
+                    leaderboardThread = new leaderBoardThread(e, Time);
+                    leaderboardThread.run();
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
                 EmbedBuilder leaderboard = null;
                 try {
                     leaderboard = new EmbedBuilder()
@@ -142,6 +172,7 @@ public class response extends ListenerAdapter {
                     Arrays.stream(Database.get(e.getGuild().getId()).get("users").toString().split(" ")).forEach(userId ->{
                         Database.collection.deleteOne(new Document("userId", userId));
                     });
+                    Database.set(e.getGuild().getId(),"users", "", false );
                 } catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
                 }
