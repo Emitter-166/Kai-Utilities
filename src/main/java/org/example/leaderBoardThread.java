@@ -6,25 +6,26 @@ import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
-public class leaderBoardThread implements Runnable{
-    CountDownLatch latch;
+public class leaderBoardThread{
     MessageReceivedEvent e;
     String time;
 
-    public leaderBoardThread(MessageReceivedEvent e, String time,CountDownLatch latch ) {
+    public leaderBoardThread(MessageReceivedEvent e, String time) {
         this.e = e;
         this.time = time;
-        this.latch = latch;
     }
     List<Double> messages = new ArrayList<>();
     Map<Double, String> reverseUser = new HashMap<>();
 
-    public StringBuilder getWinnersBuilder() {
+    CountDownLatch latch = new CountDownLatch(1);
+
+    public StringBuilder getWinnersBuilder() throws InterruptedException {
+        latch.await();
         return winnersBuilder;
     }
 
     StringBuilder winnersBuilder = new StringBuilder();
-    @Override
+
     public void run() {
 
         try{
@@ -43,10 +44,11 @@ public class leaderBoardThread implements Runnable{
         }
 
         try {
-            for (int i = 2, j = 0; i > 0; i--, j++) {
+            for (int i = messages.size(), j = 0; i > 0; i--, j++) {
                 if (i == 0) break;
-                String winnerAsMention = e.getGuild().retrieveMemberById(reverseUser.get(messages.stream().sorted().collect(Collectors.toList()).get(i - 1)))
-                        .complete().getAsMention();
+                if(j >= 15) break;
+                String winnerAsMention = String.format("<@%s>",reverseUser.get(messages.stream().sorted().collect(Collectors.toList()).get(i - 1)) );
+
                 String amountOfMessages = String.valueOf(Math.floor(messages.stream().sorted().collect(Collectors.toList()).get(i - 1)));
                 winnersBuilder.append(String.format("%s. %s - %s messages \n", j + 1, winnerAsMention, amountOfMessages));
             }
