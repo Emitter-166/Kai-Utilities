@@ -1,3 +1,0 @@
-whenever someone sends a message in mainchat, it
-
-first I need to create a hashmap containing real key and values as key. then I will sort the array, then use a stringbuilder to get those values
