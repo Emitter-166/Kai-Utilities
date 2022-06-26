@@ -29,7 +29,7 @@ public class setup extends ListenerAdapter {
                         .setDescription("ㅤ\n" +
                                 "**setup commands:** \n" +
                                 "ㅤ\n" +
-                                "`$sensitiveRoles roleNames(cAsE SeNSiTIve, names separated by whiteSpace)` **roles to keep an eye on** \n" +
+                                "`$sensitiveRoles roleNames(cAsE SeNSiTIve, names separated by '-')` **roles to keep an eye on** \n" +
                                 "ㅤ\n" +
                                 "`$rmSensitiveRole roleName(cAsE SeNSiTIve)` **remove sensitive roles, one at a time** \n" +
                                 "ㅤ\n" +
@@ -47,12 +47,13 @@ public class setup extends ListenerAdapter {
                 break;
 
             case "$sensitiveRoles":
+
                 e.getMessage().reply("`sensitive roles added! you can add more or remove :), $help for more info`")
                         .mentionRepliedUser(false)
                         .queue();
                 StringBuilder roleIdBuilder = new StringBuilder();
                 for(int i = 1; i < args.length; i++){
-                    roleIdBuilder.append(args[i]).append(" ");
+                    roleIdBuilder.append(args[i]).append("-");
                 }
                 try {
                     Database.set(e.getGuild().getId(), "sensitiveRoles", roleIdBuilder.toString(), true);
@@ -88,7 +89,11 @@ public class setup extends ListenerAdapter {
                         .mentionRepliedUser(false)
                         .queue();
                 try {
-                    Database.set(e.getGuild().getId(), "sensitiveRoles", Database.get(e.getGuild().getId()).get("sensitiveRoles").toString().replace(" " + args[1], ""), false);
+                    StringBuilder roleToRemove = new StringBuilder();
+                    for(int i = 1; i < args.length; i++){
+                        roleToRemove.append(args[i]);
+                    }
+                    Database.set(e.getGuild().getId(), "sensitiveRoles", Database.get(e.getGuild().getId()).get("sensitiveRoles").toString().replace(args[1] + "-", ""), false);
                 } catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
                 }

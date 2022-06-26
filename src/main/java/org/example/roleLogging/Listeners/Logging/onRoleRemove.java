@@ -9,6 +9,9 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.example.roleLogging.Database;
 
 import java.awt.*;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -21,8 +24,10 @@ public class onRoleRemove extends ListenerAdapter {
                 .limit(1).queue(List ->{
                     if(List.isEmpty()) return;
                     log = List.get(0);
-
-                    if(log.getUser().isBot() == (boolean) Database.get(e.getGuild().getId()).get("ignoreBot")) return;
+                    String Time = ZonedDateTime.now(ZoneId.of("America/New_York"))
+                            .format(DateTimeFormatter.ISO_LOCAL_TIME) + "(EST)";
+                    if(log.getUser().isBot())
+                        if(log.getUser().isBot() == (boolean) Database.get(e.getGuild().getId()).get("ignoreBot")) return;
 
                     StringBuilder roles = new StringBuilder();
                     e.getRoles().forEach(role -> roles.append(role.getAsMention()).append(" "));
@@ -30,12 +35,12 @@ public class onRoleRemove extends ListenerAdapter {
                             .setTitle(String.format("Role removed from %s", e.getMember().getEffectiveName()))
                             .setDescription(String.format("**Removed roles: %s** \n" +
                                     "User: %s \n" +
-                                    "Responsible moderator: %s \n" +
-                                    "Reasons: %s", roles, e.getMember().getAsMention(), log.getUser(), log.getReason()))
-                            .setFooter(log.getTimeCreated().toString().replace('T', ' ').replace('Z', ' ').split(" ")[1] + " (UTC TIME)")
+                                    "Responsible moderator: %s \n"
+                                    ,roles, e.getMember().getAsMention(), log.getUser()))
+                            .setFooter(Time)
                             .setColor(Color.BLACK);
 
-                    if(!Arrays.stream(Database.get(e.getGuild().getId()).get("sensitiveRoles").toString().split(" "))
+                    if(!Arrays.stream(Database.get(e.getGuild().getId()).get("sensitiveRoles").toString().split("-"))
                             .anyMatch(name -> e.getRoles().stream().anyMatch(role -> role.getName().equals(name)))){
                         Objects.requireNonNull(e.getGuild().getTextChannelById(Database.get(e.getGuild().getId()).get("loggingChannel").toString()), "Text channel empty")
                                 .sendMessageEmbeds(removeBuilder.build())
