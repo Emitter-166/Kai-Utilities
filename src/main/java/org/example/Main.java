@@ -14,7 +14,7 @@ import javax.security.auth.login.LoginException;
 public class Main {
     static JDA jda;
     public static void main(String[] args) throws LoginException {
-        jda = JDABuilder.createLight("OTYxNjM3NDA1NTcwNDk4NjUy.G_IVj1.MxjqN9HVOkU3EmtXmx9GLdBMsWshbhWunDQGG4")
+        jda = JDABuilder.createLight(System.getenv("token"))
                 .addEventListeners(new counter())
                 .addEventListeners(new Database())
                 .addEventListeners(new response())
