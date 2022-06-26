@@ -1,10 +1,12 @@
-package org.example;
+package org.example.Leaderboard;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.bson.Document;
+import org.example.Leaderboard.Database;
+import org.example.Leaderboard.leaderBoardThread;
 
 import java.awt.*;
 import java.time.ZoneId;
@@ -51,7 +53,7 @@ public class response extends ListenerAdapter {
                 break;
 
             case ".leaderboard":
-                leaderBoardThread leaderboardThread = null;
+                leaderBoardThread leaderboardThread;
                 try {
                     leaderboardThread = new leaderBoardThread(e, Time);
                 } catch (InterruptedException ex) {
@@ -139,17 +141,18 @@ public class response extends ListenerAdapter {
         }
 
         //summary of the day
-        String[] timeArgs = Time.split(":");
+
         if (!hasSent) {
+            String[] timeArgs = Time.split(":");
             if (timeArgs[0].equalsIgnoreCase("00")) {
-                leaderBoardThread leaderboardThread = null;
+                leaderBoardThread leaderboardThread;
                 try {
                     leaderboardThread = new leaderBoardThread(e, Time);
                     leaderboardThread.run();
                 } catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
                 }
-                EmbedBuilder leaderboard = null;
+                EmbedBuilder leaderboard;
                 try {
                     leaderboard = new EmbedBuilder()
                             .setTitle("Summary of today: ")
@@ -165,6 +168,7 @@ public class response extends ListenerAdapter {
                             .content(String.format("%s", e.getGuild().getRoleById(mentionRoleId).getAsMention()))
                             .mentionRoles(mentionRoleId)
                             .queue();
+
                 } catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -176,8 +180,11 @@ public class response extends ListenerAdapter {
                 } catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
                 }
+                hasSent = true;
+
+            }else{
+                hasSent = false;
             }
-            hasSent = true;
         }
     }
 }

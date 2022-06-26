@@ -1,4 +1,4 @@
-package org.example;
+package org.example.Leaderboard;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
