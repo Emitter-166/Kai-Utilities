@@ -1,0 +1,23 @@
+https://cdn.discordapp.com/attachments/962064892557418537/990958423644471296/unknown.png
+
+step one, find the reason.
+    compare error with the working ones, get as much infos as possible
+
+    if I aready typed in a channel then try to access leaderboard, it works fine
+    but when I do it for an empty channel, nothing hape
+
+    in a healthy case, channels and message amounts are added normally, and we can access it .
+    issue one: channels are getting added together instead of a space note: only the first one is being seperated, other ones are like smashed together
+    when I write in the channel, it gets added by a whitespace.
+    update: the values are getting attached when messages are send
+
+
+    issue two: channel is not getting created in database, a seperate field in document is suppose be created in server settings document
+
+    update: it's fixed
+
+    first issue was happening because we were using keys as values at one point and didn't add a space there, simple
+    second issue was happening cause when it tries to check if that value was there before, it got null pointer exception because it's new
+
+
+    issues needs to be fixed again: where there is no whitespace in users. (solved)

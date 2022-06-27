@@ -35,21 +35,35 @@ public class leaderBoardThread{
                 .append(" \n");
 
         try{
-            System.out.println(ChannelId);
-            System.out.println(Database.get(e.getGuild().getId()));
-            System.out.println(Arrays.toString(Database.get(e.getGuild().getId()).get(ChannelId).toString().split(" ")));
 
-            Arrays.stream(Database.get(e.getGuild().getId()).get(ChannelId).toString().split(" ")).forEach(userId -> {
-                double counted;
-                try {
-                    counted = (double) Database.getUser(userId, ChannelId);
-                } catch (InterruptedException ex) {
-                    throw new RuntimeException(ex);
-                }
-                messages.add(counted);
-                reverseUser.put(counted, userId);
-            });
+            try{
+                Arrays.stream(Database.get(e.getGuild().getId()).get(ChannelId).toString().split(" ")).forEach(userId -> {
+                    double counted;
+                    try {
+                        try{
+                            counted = (double) Database.getUser(userId, ChannelId);
+                        }catch (NullPointerException exception){
+                            winnersBuilder = new StringBuilder()
+                                    .append("`No Messages for that channel`");
+                            return;
+                        }
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    messages.add(counted);
+                    reverseUser.put(counted, userId);
+                });
+            }catch (NullPointerException exception){
+            winnersBuilder = new StringBuilder()
+                    .append("`No Messages for that channel`");
+
+            latch.countDown();
+            return;
+
+        }
+
         } catch (InterruptedException ex) {
+            ex.printStackTrace();
             throw new RuntimeException(ex);
         }
 

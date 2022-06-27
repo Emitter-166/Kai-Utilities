@@ -185,27 +185,43 @@ public class response extends ListenerAdapter {
                                 .mentionRepliedUser(false)
                                 .queue();
                         try {
-                            Arrays.stream(Database.get(e.getGuild().getId()).get("channels").toString().split(" ")).forEach(channel->{
+                            Document document = Database.get(e.getGuild().getId());
+                            //deleting channels from server settings
+                            Arrays.stream(document.get("channels").toString().split(" ")).forEach(channel->{
+                                Document document1;
                                 try {
-                                    Document document = Database.get(e.getGuild().getId());
-                                    System.out.println(channel);
-                                    System.out.println(document.get(channel));
-                                    Arrays.stream(document.get(channel).toString().split(" ")).forEach(user ->{
+                                     document1 = Database.get(e.getGuild().getId());
+                                } catch (InterruptedException ex) {
+                                    throw new RuntimeException(ex);
+                                }
+                                try {
+                                    Arrays.stream(Database.get(e.getGuild().getId()).get("channels").toString().split(" ")).forEach(channelz->{
+                                        Document Updatedocument;
                                         try {
-                                            Database.collection.deleteOne(Database.getUserDoc(user));
-
+                                            Updatedocument = new Document(channelz, Database.get(e.getGuild().getId()).get(channelz));
                                         } catch (InterruptedException ex) {
                                             throw new RuntimeException(ex);
                                         }
+                                        Bson updateKey = new Document("$unset", Updatedocument);
+                                        Database.collection.updateOne(document1 , updateKey);
                                     });
+                                } catch (Exception ex) {
+                                    ex.printStackTrace();
+                                }
+                            });
 
+                            //deleting user docs
+                            Arrays.stream(document.get("users").toString().split(" ")).forEach(user->{
 
-
-                                    Database.collection.updateOne(document, new Document("$set", document.remove(channel)));
+                                try {
+                                    Database.collection.deleteOne(Database.getUserDoc(user));
                                 } catch (InterruptedException ex) {
                                     throw new RuntimeException(ex);
                                 }
                             });
+
+                            Database.set(e.getGuild().getId(), "channels", "", false);
+                            Database.set(e.getGuild().getId(), "users", "", false);
                         } catch (InterruptedException ex) {
                             throw new RuntimeException(ex);
                         }
@@ -242,7 +258,7 @@ public class response extends ListenerAdapter {
                 try {
                     if ((boolean) Database.get(e.getGuild().getId()).get("reset"))
                         if (!hasSent) {
-                            String[] timeArgs = Time.split(":");
+                            String[] timeArgs = {"00"}; //Time.split(":");
                             if (timeArgs[0].equalsIgnoreCase("00")) {
                                 leaderBoardThread leaderboardThread;
                                 try {
@@ -271,25 +287,53 @@ public class response extends ListenerAdapter {
                                 } catch (InterruptedException ex) {
                                     throw new RuntimeException(ex);
                                 }
+                                Document document = null;
                                 try {
-                                    Arrays.stream(Database.get(e.getGuild().getId()).get("users").toString().split(" ")).forEach(userId -> {
-                                        Database.collection.deleteOne(new Document("userId", userId));
-                                    });
-                                    Database.set(e.getGuild().getId(), "users", "", false);
-                                } catch (InterruptedException ex) {
-                                    throw new RuntimeException(ex);
+                                    document = Database.get(e.getGuild().getId());
+                                } catch (InterruptedException exc) {
+                                    throw new RuntimeException(exc);
                                 }
-                                Arrays.stream(Database.get(e.getGuild().getId()).get("channels").toString().split(" ")).forEach(channel->{
+                                //deleting channels from server settings
+                                Arrays.stream(document.get("channels").toString().split(" ")).forEach(channel->{
+                                    Document document1;
                                     try {
-                                        Document document = Database.get(e.getGuild().getId());
-                                        Document updateDoc = (Document) document.remove(channel);
+                                        document1 = Database.get(e.getGuild().getId());
+                                    } catch (InterruptedException ex) {
+                                        throw new RuntimeException(ex);
+                                    }
+                                    try {
+                                        Arrays.stream(Database.get(e.getGuild().getId()).get("channels").toString().split(" ")).forEach(channelz->{
+                                            Document Updatedocument;
+                                            try {
+                                                Updatedocument = new Document(channelz, Database.get(e.getGuild().getId()).get(channelz));
+                                            } catch (InterruptedException ex) {
+                                                throw new RuntimeException(ex);
+                                            }
+                                            Bson updateKey = new Document("$unset", Updatedocument);
+                                            Database.collection.updateOne(document1 , updateKey);
+                                        });
+                                    } catch (Exception ex) {
+                                        ex.printStackTrace();
+                                    }
+                                });
 
-                                        Bson key = new Document("$set", updateDoc);
-                                        Database.collection.updateOne(document, updateDoc);
+                                //deleting user docs
+                                Arrays.stream(document.get("users").toString().split(" ")).forEach(user->{
+
+                                    try {
+                                        Database.collection.deleteOne(Database.getUserDoc(user));
                                     } catch (InterruptedException ex) {
                                         throw new RuntimeException(ex);
                                     }
                                 });
+
+                                try {
+                                    Database.set(e.getGuild().getId(), "channels", "", false);
+                                    Database.set(e.getGuild().getId(), "users", "", false);
+                                } catch (InterruptedException exc) {
+                                    throw new RuntimeException(exc);
+                                }
+
                                 hasSent = true;
 
                             } else {

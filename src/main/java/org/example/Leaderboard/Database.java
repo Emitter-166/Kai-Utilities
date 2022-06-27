@@ -18,7 +18,7 @@ public class Database extends ListenerAdapter {
     @Override
     public void onReady(ReadyEvent e){
 
-        String uri = System.getenv("uri");;
+        String uri = System.getenv("uri");
         MongoClientURI clientURI = new MongoClientURI(uri);
         MongoClient client = new MongoClient(clientURI);
         MongoDatabase database = client.getDatabase("count");
@@ -28,7 +28,7 @@ public class Database extends ListenerAdapter {
 
 
     public static void set(String Id, String Key, Object value, boolean isAdd) throws InterruptedException {
-        updateDB(Id,"serverId", Key, value, isAdd);;
+        updateDB(Id,"serverId", Key, value, isAdd);
     }
 
     public static void setUser(String UserId, String Key, Object value, boolean isAdd) throws InterruptedException {
@@ -41,6 +41,7 @@ public class Database extends ListenerAdapter {
         try{
             return (Document) collection.find(new Document("serverId", Id)).cursor().next();
         }catch (NoSuchElementException exception){
+            System.out.println("No DB");
             createDB(Id);
             Thread.sleep(200);
             return (Document) collection.find(new Document("serverId", Id)).cursor().next();
@@ -81,7 +82,8 @@ public class Database extends ListenerAdapter {
                 .append("roleToMention", "0")
                 .append("mainChat", "")
                 .append("reset", true)
-                .append("channels", "");
+                .append("channels", "")
+                .append("users", "");
 
         collection.insertOne(document);
 
@@ -118,10 +120,17 @@ public class Database extends ListenerAdapter {
 
             if(field.equalsIgnoreCase("serverId") ){
                 try{
+
+                    try{
+                        Arrays.toString(document.get(key).toString().split(" "));
+                        //it's so we can add extra dynamic fields to server settings document
+                    }catch (NullPointerException exception){
+                        Database.set(Id, key, "", false);
+                    }
                     if(Arrays.stream(document.get(key).toString().split(" ")).anyMatch(users -> users.equalsIgnoreCase(((String) value).replace(" ", "")))) {
                         return;
                     }
-                }catch (NullPointerException exception){
+                }catch (Exception exception){
                     Thread.sleep(250);
                 }
             }
@@ -132,7 +141,9 @@ public class Database extends ListenerAdapter {
                 }catch (NullPointerException e){
                     Updatedocument = new Document(key, value);
                     if(field.equalsIgnoreCase("serverId")){
-                        Database.set(Id, "channels", key, true);
+                        Database.set(Id, "channels", key + " ", true);
+                        Database.set(Id, key,value, true);
+
                     }
                 }
 
