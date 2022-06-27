@@ -35,6 +35,9 @@ public class leaderBoardThread{
                 .append(" \n");
 
         try{
+            System.out.println(ChannelId);
+            System.out.println(Database.get(e.getGuild().getId()));
+            System.out.println(Arrays.toString(Database.get(e.getGuild().getId()).get(ChannelId).toString().split(" ")));
 
             Arrays.stream(Database.get(e.getGuild().getId()).get(ChannelId).toString().split(" ")).forEach(userId -> {
                 double counted;

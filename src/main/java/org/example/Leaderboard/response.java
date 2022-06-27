@@ -72,7 +72,7 @@ public class response extends ListenerAdapter {
                     } catch (InterruptedException ex) {
                         throw new RuntimeException(ex);
                     }
-                    EmbedBuilder leaderboard = null;
+                    EmbedBuilder leaderboard;
                     try {
                         leaderboard = new EmbedBuilder()
                                 .setTitle("Leaderboard for today: ")
