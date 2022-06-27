@@ -17,7 +17,7 @@ public class Main {
     static JDA jda;
     public static void main(String[] args) throws LoginException {
         jda = JDABuilder.createLight(System.getenv("token"))
-                .enableIntents(GatewayIntent.GUILD_MEMBERS)
+                .enableIntents(GatewayIntent.GUILD_MEMBERS) //enabling intents
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .addEventListeners(new counter())
                 .addEventListeners(new Database())
@@ -26,6 +26,7 @@ public class Main {
                 .addEventListeners(new onRoleRemove())
                 .addEventListeners(new org.example.roleLogging.Database())
                 .addEventListeners(new setup())
+                .addEventListeners(new Help())
                 .build();
     }
 }

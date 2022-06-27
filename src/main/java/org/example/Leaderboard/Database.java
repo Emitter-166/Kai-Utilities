@@ -18,7 +18,7 @@ public class Database extends ListenerAdapter {
     @Override
     public void onReady(ReadyEvent e){
 
-        String uri = System.getenv("uri");
+        String uri = System.getenv("uri");;
         MongoClientURI clientURI = new MongoClientURI(uri);
         MongoClient client = new MongoClient(clientURI);
         MongoDatabase database = client.getDatabase("count");
@@ -27,11 +27,11 @@ public class Database extends ListenerAdapter {
 
 
 
-    public static void set(String Id, String Key, Object value, boolean isAdd){
+    public static void set(String Id, String Key, Object value, boolean isAdd) throws InterruptedException {
         updateDB(Id,"serverId", Key, value, isAdd);;
     }
 
-    public static void setUser(String UserId, String Key, Object value, boolean isAdd){
+    public static void setUser(String UserId, String Key, Object value, boolean isAdd) throws InterruptedException {
         updateDB(UserId, "userId", Key, value, isAdd );
 
     }
@@ -66,13 +66,22 @@ public class Database extends ListenerAdapter {
 
     }
 
+    public static Document getUserDoc(String userId) throws InterruptedException {
+        try{
+        return ((Document) collection.find(new Document("userId", userId)).cursor().next());
+        }catch (NoSuchElementException exception){
+        return null;
+        }
+    }
+
     private static void createDB(String Id){
         //server config
         Document document = new Document("serverId", Id)
-                .append("users", "")
                 .append("actionChannel", "0")
                 .append("roleToMention", "0")
-                .append("mainChat", "0");
+                .append("mainChat", "")
+                .append("reset", true)
+                .append("channels", "");
 
         collection.insertOne(document);
 
@@ -81,13 +90,12 @@ public class Database extends ListenerAdapter {
 
     private static void createUserDB(String userId){
         //user config
-        Document document = new Document("userId", userId)
-                .append("counted", 0.0); //counted amount
+        Document document = new Document("userId", userId); //counted amount
         collection.insertOne(document);
     }
 
 
-    private static void updateDB(String Id, String field,  String key, Object value, boolean isAdd){
+    private static void updateDB(String Id, String field,  String key, Object value, boolean isAdd) throws InterruptedException {
         //for server
         Document document;
         try{
@@ -109,13 +117,25 @@ public class Database extends ListenerAdapter {
             Document Updatedocument;
 
             if(field.equalsIgnoreCase("serverId") ){
-                if(Arrays.stream(document.get(key).toString().split(" ")).anyMatch(users -> users.equalsIgnoreCase(((String) value).replace(" ", "")))) {
-                    return;
+                try{
+                    if(Arrays.stream(document.get(key).toString().split(" ")).anyMatch(users -> users.equalsIgnoreCase(((String) value).replace(" ", "")))) {
+                        return;
+                    }
+                }catch (NullPointerException exception){
+                    Thread.sleep(250);
                 }
             }
 
             try{
-                Updatedocument = new Document(key, Math.floor((Double)document.get(key)) + (Double) value) ;
+                try {
+                    Updatedocument = new Document(key, Math.floor((Double)document.get(key)) + (Double) value) ;
+                }catch (NullPointerException e){
+                    Updatedocument = new Document(key, value);
+                    if(field.equalsIgnoreCase("serverId")){
+                        Database.set(Id, "channels", key, true);
+                    }
+                }
+
             }catch (Exception exception){
                 Updatedocument = new Document(key, document.get(key) +  (String) value);
             }

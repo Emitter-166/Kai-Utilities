@@ -9,10 +9,12 @@ import java.util.stream.Collectors;
 public class leaderBoardThread{
     MessageReceivedEvent e;
     String time;
+    String ChannelId;
 
-    public leaderBoardThread(MessageReceivedEvent e, String time) throws InterruptedException {
+    public leaderBoardThread(MessageReceivedEvent e, String time, String ChannelId) throws InterruptedException {
         this.e = e;
         this.time = time;
+        this.ChannelId =  ChannelId;
     }
     List<Double> messages = new ArrayList<>();
     Map<Double, String> reverseUser = new HashMap<>();
@@ -29,14 +31,15 @@ public class leaderBoardThread{
 
     public void run() throws InterruptedException {
         winnersBuilder = new StringBuilder()
-                .append(String.format("**Leader board for <#%s>**", Database.get(e.getGuild().getId()).get("mainChat")))
+                .append(String.format("**Leader board for <#%s>**", ChannelId))
                 .append(" \n");
 
         try{
-            Arrays.stream(Database.get(e.getGuild().getId()).get("users").toString().split(" ")).forEach(userId -> {
+
+            Arrays.stream(Database.get(e.getGuild().getId()).get(ChannelId).toString().split(" ")).forEach(userId -> {
                 double counted;
                 try {
-                    counted = (double) Database.getUser(userId, "counted");
+                    counted = (double) Database.getUser(userId, ChannelId);
                 } catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
                 }
