@@ -29,4 +29,9 @@ step one, find the reason.
     there will be a way to increase percentages of their chance to win
 
 
-    and ofc, there is bugs in leaderboard. time to debug
+    and ofc, there is bugs in leaderboard. time to debug (fixed)
+
+    next things to get done:
+        make smile giver simpler and removing manual give with a special feature
+        fix .messages command
+        add auto picker feature

@@ -12,13 +12,16 @@ import java.util.Arrays;
 public class giver extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {
+        //checking perms
         if (!e.getMember().hasPermission(Permission.ADMINISTRATOR)) return;
         if(e.getAuthor().equals(Main.jda.getSelfUser())) return;
+
 
         String[] args = e.getMessage().getContentRaw().split(" ");
         if (args[0].equalsIgnoreCase(".smileGiver")) {
             switch (args[1]) {
                 case "help":
+                    //help command
                     EmbedBuilder helpBuilder = new EmbedBuilder()
                             .setTitle("Setup help")
                             .setColor(Color.WHITE)
@@ -40,6 +43,7 @@ public class giver extends ListenerAdapter {
                     break;
 
                 case "bulkGive":
+                    //this command will send a generated command according to the input to the channel, making manual tasks easier
                     String amount = args[2];
                     StringBuilder usersBuilder = new StringBuilder();
 
@@ -59,6 +63,7 @@ public class giver extends ListenerAdapter {
                     break;
 
                 case "manualGive":
+                    //this command will have modified amount for each element, so it's more flexible than the last one but less effiecient
                      for(int i = 2; i < args.length; i++){
                          String userMention = "<@" + args[i].split(":")[0]+ ">";
                          String Manualamount = args[i].split(":")[1] ;

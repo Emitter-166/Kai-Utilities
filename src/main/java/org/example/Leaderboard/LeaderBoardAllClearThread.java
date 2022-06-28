@@ -28,10 +28,12 @@ public class LeaderBoardAllClearThread{
                     Database.setUser(userId, args[1].replace("<", "")
                             .replace("#", "")
                             .replace(">", ""), 0.0, false);
+                    //setting value to 0 of that channel for that users db
                 } catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
                 }
             });
+            //setting value of that channel on server settings to nothing
             Database.set(e.getGuild().getId(), args[1].replace("<", "")
                     .replace("#", "")
                     .replace(">", ""), "", false);
@@ -46,6 +48,7 @@ public class LeaderBoardAllClearThread{
     Thread clearAll = new Thread() {
         @Override
         public void run() {
+            //this thread is to clear everything in the database and only keep server settings
             try {
                 System.out.println("Clear all running");
                 Document document = Database.get(e.getGuild().getId());

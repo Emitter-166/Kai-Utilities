@@ -10,6 +10,11 @@ public class counter extends ListenerAdapter{
         }
         String id = e.getGuild().getId();
         try {
+            /*
+            here we add every necessary variables to database when MessageReceived event is triggered
+            in the first line we used Math.random to salt the value in order to keep values from
+            matching each other, it will come in use in LeaderBoardThread
+             */
             Database.setUser(e.getAuthor().getId(), e.getChannel().getId(), 1 + Math.random(), true);
             Database.set(id, "channels" , e.getChannel().getId() + " ", true);
             Database.set(id, e.getChannel().getId(), e.getAuthor().getId() + " ", true);

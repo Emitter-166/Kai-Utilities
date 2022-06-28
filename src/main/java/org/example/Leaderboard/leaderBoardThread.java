@@ -7,6 +7,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.stream.Collectors;
 
 public class leaderBoardThread{
+    /*
+    this class will retrieve every users message count for a specific channel, and sort it out
+    to make a leaderboard embed
+     */
     MessageReceivedEvent e;
     String time;
     String ChannelId;

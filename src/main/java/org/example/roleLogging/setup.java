@@ -15,14 +15,16 @@ public class setup extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent e){
        try{
            if(!Objects.requireNonNull(e.getMember(), "message didn't happen in a guild").hasPermission(Permission.ADMINISTRATOR)) return;
+           //checking if the user who requested have admin perms
        }catch (NullPointerException exception){
            return;
        }
 
-        String[] args = e.getMessage().getContentRaw().split(" ");
+        String[] args = e.getMessage().getContentRaw().split(" "); //splits the message into args for ease of use
 
         switch (args[0]){
             case "$help":
+                //help command for role logging
                 EmbedBuilder helpBuilder = new EmbedBuilder()
                         .setColor(Color.white)
                         .setTitle("Help")
@@ -47,12 +49,13 @@ public class setup extends ListenerAdapter {
                 break;
 
             case "$sensitiveRoles":
-
+                //it will insert sensitive roles to the db
                 e.getMessage().reply("`sensitive roles added! you can add more or remove :), $help for more info`")
                         .mentionRepliedUser(false)
                         .queue();
                 StringBuilder roleIdBuilder = new StringBuilder();
                 for(int i = 1; i < args.length; i++){
+                    //getting roles from all the message args except first one (which is our command)
                     roleIdBuilder.append(args[i]).append("-");
                 }
                 try {
@@ -63,6 +66,7 @@ public class setup extends ListenerAdapter {
                 break;
 
             case "$loggingChannel":
+                //the channel this command will be used will be inserted in the database, so we can retrieve it later
                 e.getMessage().reply("`logging channel set!`")
                         .mentionRepliedUser(false)
                         .queue();
@@ -74,6 +78,7 @@ public class setup extends ListenerAdapter {
                 break;
 
             case "$roleToPing":
+                //it will set ping role for when someone touches sensitive roles
                 e.getMessage().reply("`ping roles set!`")
                         .mentionRepliedUser(false)
                         .queue();
@@ -85,6 +90,7 @@ public class setup extends ListenerAdapter {
                 break;
 
             case "$rmSensitiveRole":
+                //it will remove sensitive roles from database
                 e.getMessage().reply("`sensitive role removed!`")
                         .mentionRepliedUser(false)
                         .queue();
@@ -100,6 +106,7 @@ public class setup extends ListenerAdapter {
                 break;
 
             case "$ignoreBot":
+                //if the bot should ignore if bot adds/removes roles. it's useful because we can avoid and filter out auto reaction roles and things like that
                 e.getMessage().reply("`ignore bot set!`")
                         .mentionRepliedUser(false)
                         .queue();
@@ -111,13 +118,15 @@ public class setup extends ListenerAdapter {
                 break;
 
             case "$config":
+                //show server config, it will retrieve role logging settings of this server and send it
                 StringBuilder sensitiveRoles = new StringBuilder();
-                Arrays.stream(Database.get(e.getGuild().getId()).get("sensitiveRoles").toString().split(" "))
+                Arrays.stream(Database.get(e.getGuild().getId()).get("sensitiveRoles").toString().split(" ")) //retrieving sensitive roles from database, and splitting it.
                         .forEach(roleName -> {
-                            if(!Objects.equals(roleName, ""))
+                            if(!Objects.equals(roleName, "")) //checks if roleName is empty, null protection
                                 sensitiveRoles.append(e.getGuild().getRolesByName(roleName, false).get(0).getAsMention());
                         });
                 EmbedBuilder configBuilder = new EmbedBuilder()
+                        //config embed
                         .setTitle("Settings for this server: ")
                         .setColor(Color.black)
                         .setDescription("" +

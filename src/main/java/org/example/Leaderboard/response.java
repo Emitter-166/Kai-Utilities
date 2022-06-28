@@ -18,7 +18,7 @@ public class response extends ListenerAdapter {
 
 
     public void onMessageReceived(MessageReceivedEvent e) {
-        String Time = ZonedDateTime.now(ZoneId.of("America/New_York"))
+        String Time = ZonedDateTime.now(ZoneId.of("America/New_York")) //getting EST time
                 .format(DateTimeFormatter.ISO_LOCAL_TIME) + "(EST)";
 
 
@@ -27,6 +27,7 @@ public class response extends ListenerAdapter {
 
             case ".l":
                 if (args[1].equalsIgnoreCase("help")) {
+                    //help embed for leaderboard
                     EmbedBuilder helpBuilder = new EmbedBuilder()
                             .setTitle("Help")
                             .setColor(Color.WHITE)
@@ -39,6 +40,7 @@ public class response extends ListenerAdapter {
 
 
                     if (e.getMember().hasPermission(Permission.ADMINISTRATOR)) {
+                        //if the user have admin perms, it will send a setup embed with the regular help one
                         EmbedBuilder setupHelpBuilder = new EmbedBuilder()
                                 .setTitle("Help commands for leaderboard setup")
                                 .setColor(Color.WHITE)
@@ -58,6 +60,7 @@ public class response extends ListenerAdapter {
 
             case ".leaderboard":
                 if (args.length == 2) {
+                    //this will send a leaderboard of specific channel
                     leaderBoardThread leaderboardThread;
                     try {
                         leaderboardThread = new leaderBoardThread(e, Time,
@@ -98,6 +101,7 @@ public class response extends ListenerAdapter {
                 break;
 
             case ".mainChat":
+                //setting main chat, aka which chats summary to send every end of the day
                 if (!e.getMember().hasPermission(Permission.ADMINISTRATOR)) return;
                 e.getMessage().reply("`main chat set! messages will be monitored here!`")
                         .mentionRepliedUser(false)
@@ -110,6 +114,7 @@ public class response extends ListenerAdapter {
                 break;
 
             case ".actionChannel":
+                //sets which channel to send the summary
                 if (!e.getMember().hasPermission(Permission.ADMINISTRATOR)) return;
                 e.getMessage().reply("`Action set! Summaries will be sent here!`")
                         .mentionRepliedUser(false)
@@ -122,6 +127,7 @@ public class response extends ListenerAdapter {
                 break;
 
             case ".roleToMention":
+                //role to mention with the summary
                 if (!e.getMember().hasPermission(Permission.ADMINISTRATOR)) return;
                 e.getMessage().reply("`ping roles set! this role will be pinged with the summaries!`")
                         .mentionRepliedUser(false)
@@ -134,6 +140,7 @@ public class response extends ListenerAdapter {
                 break;
 
             case ".messages":
+                //retrieves message counts and send it to the channel
                 if (args.length == 1) {
                     try {
                         e.getMessage().reply(String.format("You have a total of %s messages today!", Math.floor((Double) Database.getUser(e.getAuthor().getId(), "counted"))))
@@ -155,6 +162,7 @@ public class response extends ListenerAdapter {
                 break;
 
             case ".clear":
+                //commands to clear leaderboard for every channel or just one specific channel
                 if (args.length == 2) {
                     if (!e.getMember().hasPermission(Permission.MODERATE_MEMBERS)) return;
                     if(!args[1].equalsIgnoreCase("all")){
@@ -189,6 +197,7 @@ public class response extends ListenerAdapter {
                 break;
 
                 case ".reset":
+                    //setting if the leaderboard should be reset every end of the day and a summary will should be sent
                         if (args.length != 2) return;
                         e.getMessage().reply(String.format("Resetting leaderboard every 24 hours is set to %s", args[1]))
                                 .mentionRepliedUser(false)
@@ -201,7 +210,7 @@ public class response extends ListenerAdapter {
                         break;
                 }
 
-                //summary of the day
+                //sending summary of the day
                 try {
                     if ((boolean) Database.get(e.getGuild().getId()).get("reset"))
                         if (!hasSent) {
