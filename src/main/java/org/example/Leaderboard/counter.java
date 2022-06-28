@@ -5,6 +5,9 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class counter extends ListenerAdapter{
     public void onMessageReceived(MessageReceivedEvent e){
+        switch (e.getMessage().getContentRaw().split(" ")[0]){
+            case ".clear": return;
+        }
         String id = e.getGuild().getId();
         try {
             Database.setUser(e.getAuthor().getId(), e.getChannel().getId(), 1 + Math.random(), true);

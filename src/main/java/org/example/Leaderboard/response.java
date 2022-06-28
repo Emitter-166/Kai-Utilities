@@ -161,70 +161,17 @@ public class response extends ListenerAdapter {
                         e.getMessage().reply("Leader board cleared!")
                                 .mentionRepliedUser(false)
                                 .queue();
-                        try {
-                            Arrays.stream(Database.get(e.getGuild().getId()).get(args[1].replace("<", "")
-                                    .replace("#", "")
-                                    .replace(">", "")).toString().split(" ")).forEach(userId -> {
-                                try {
-                                    Database.setUser(userId, args[1].replace("<", "")
-                                            .replace("#", "")
-                                            .replace(">", ""), 0.0, false);
-                                } catch (InterruptedException ex) {
-                                    throw new RuntimeException(ex);
-                                }
-                            });
-                            Database.set(e.getGuild().getId(), args[1].replace("<", "")
-                                    .replace("#", "")
-                                    .replace(">", ""), "", false);
-
-                        } catch (InterruptedException ex) {
-                            throw new RuntimeException(ex);
-                        }
+                        LeaderBoardAllClearThread leaderBoardAllClearThread = new LeaderBoardAllClearThread(args, e);
+                        leaderBoardAllClearThread.clearOne.start();
+                        System.out.println("clear one thread running");
                     }else{
+
+                        LeaderBoardAllClearThread leaderBoardAllClearThread = new LeaderBoardAllClearThread(args, e);
+                        leaderBoardAllClearThread.clearAll.start();
+                        System.out.println("clear All thread running");
                         e.getMessage().reply("Leader board cleared!")
                                 .mentionRepliedUser(false)
                                 .queue();
-                        try {
-                            Document document = Database.get(e.getGuild().getId());
-                            //deleting channels from server settings
-                            Arrays.stream(document.get("channels").toString().split(" ")).forEach(channel->{
-                                Document document1;
-                                try {
-                                     document1 = Database.get(e.getGuild().getId());
-                                } catch (InterruptedException ex) {
-                                    throw new RuntimeException(ex);
-                                }
-                                try {
-                                    Arrays.stream(Database.get(e.getGuild().getId()).get("channels").toString().split(" ")).forEach(channelz->{
-                                        Document Updatedocument;
-                                        try {
-                                            Updatedocument = new Document(channelz, Database.get(e.getGuild().getId()).get(channelz));
-                                        } catch (InterruptedException ex) {
-                                            throw new RuntimeException(ex);
-                                        }
-                                        Bson updateKey = new Document("$unset", Updatedocument);
-                                        Database.collection.updateOne(document1 , updateKey);
-                                    });
-                                } catch (Exception ex) {
-                                    ex.printStackTrace();
-                                }
-                            });
-
-                            //deleting user docs
-                            Arrays.stream(document.get("users").toString().split(" ")).forEach(user->{
-
-                                try {
-                                    Database.collection.deleteOne(Database.getUserDoc(user));
-                                } catch (InterruptedException ex) {
-                                    throw new RuntimeException(ex);
-                                }
-                            });
-
-                            Database.set(e.getGuild().getId(), "channels", "", false);
-                            Database.set(e.getGuild().getId(), "users", "", false);
-                        } catch (InterruptedException ex) {
-                            throw new RuntimeException(ex);
-                        }
 
                     }
 
@@ -293,49 +240,10 @@ public class response extends ListenerAdapter {
                                 } catch (InterruptedException exc) {
                                     throw new RuntimeException(exc);
                                 }
-                                //deleting channels from server settings
-                                Arrays.stream(document.get("channels").toString().split(" ")).forEach(channel->{
-                                    Document document1;
-                                    try {
-                                        document1 = Database.get(e.getGuild().getId());
-                                    } catch (InterruptedException ex) {
-                                        throw new RuntimeException(ex);
-                                    }
-                                    try {
-                                        Arrays.stream(Database.get(e.getGuild().getId()).get("channels").toString().split(" ")).forEach(channelz->{
-                                            Document Updatedocument;
-                                            try {
-                                                Updatedocument = new Document(channelz, Database.get(e.getGuild().getId()).get(channelz));
-                                            } catch (InterruptedException ex) {
-                                                throw new RuntimeException(ex);
-                                            }
-                                            Bson updateKey = new Document("$unset", Updatedocument);
-                                            Database.collection.updateOne(document1 , updateKey);
-                                        });
-                                    } catch (Exception ex) {
-                                        ex.printStackTrace();
-                                    }
-                                });
-
-                                //deleting user docs
-                                Arrays.stream(document.get("users").toString().split(" ")).forEach(user->{
-
-                                    try {
-                                        Database.collection.deleteOne(Database.getUserDoc(user));
-                                    } catch (InterruptedException ex) {
-                                        throw new RuntimeException(ex);
-                                    }
-                                });
-
-                                try {
-                                    Database.set(e.getGuild().getId(), "channels", "", false);
-                                    Database.set(e.getGuild().getId(), "users", "", false);
-                                } catch (InterruptedException exc) {
-                                    throw new RuntimeException(exc);
-                                }
-
+                                //deleting datas
+                                LeaderBoardAllClearThread allClearThread = new LeaderBoardAllClearThread(args, e);
+                                allClearThread.clearAll.start();
                                 hasSent = true;
-
                             } else {
                                 hasSent = false;
                             }

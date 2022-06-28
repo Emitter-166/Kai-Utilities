@@ -18,7 +18,7 @@ public class Database extends ListenerAdapter {
     @Override
     public void onReady(ReadyEvent e){
 
-        String uri = System.getenv("token");
+        String uri = System.getenv("uri");
         MongoClientURI clientURI = new MongoClientURI(uri);
         MongoClient client = new MongoClient(clientURI);
         MongoDatabase database = client.getDatabase("count");
@@ -126,6 +126,7 @@ public class Database extends ListenerAdapter {
                         //it's so we can add extra dynamic fields to server settings document
                     }catch (NullPointerException exception){
                         Database.set(Id, key, "", false);
+                        System.out.println("Added channel: " +  key);
                     }
                     if(Arrays.stream(document.get(key).toString().split(" ")).anyMatch(users -> users.equalsIgnoreCase(((String) value).replace(" ", "")))) {
                         return;

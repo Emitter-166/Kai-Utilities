@@ -27,3 +27,6 @@ step one, find the reason.
 
     auto drawer from messages, they can set the duration, amount of smiles and amount of winners, and if the winners will be selected by most typed or random one
     there will be a way to increase percentages of their chance to win
+
+
+    and ofc, there is bugs in leaderboard. time to debug
