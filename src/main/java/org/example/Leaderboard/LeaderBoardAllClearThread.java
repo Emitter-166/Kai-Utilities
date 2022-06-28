@@ -6,45 +6,38 @@ import org.bson.conversions.Bson;
 
 import java.util.Arrays;
 
-public class LeaderBoardAllClearThread{
-    String args[];
+public class LeaderBoardAllClearThread {
+    String[] args;
     MessageReceivedEvent e;
-    public LeaderBoardAllClearThread(String[] args, MessageReceivedEvent e) {
-        this.args = args;
-        this.e = e;
-    }
-    Thread clearOne = new Thread()
-
-    {
+    Thread clearOne = new Thread() {
         @Override
         public void run() {
-        try {
-            System.out.println("clear one running");
-            Arrays.stream(Database.get(e.getGuild().getId()).get(args[1].replace("<", "")
-                    .replace("#", "")
-                    .replace(">", "")).toString().split(" ")).forEach(userId -> {
-                try {
-                    System.out.println("Clear one UserId: " + userId);
-                    Database.setUser(userId, args[1].replace("<", "")
-                            .replace("#", "")
-                            .replace(">", ""), 0.0, false);
-                    //setting value to 0 of that channel for that users db
-                } catch (InterruptedException ex) {
-                    throw new RuntimeException(ex);
-                }
-            });
-            //setting value of that channel on server settings to nothing
-            Database.set(e.getGuild().getId(), args[1].replace("<", "")
-                    .replace("#", "")
-                    .replace(">", ""), "", false);
-            System.out.println("End of clear one thread");
+            try {
+                System.out.println("clear one running");
+                Arrays.stream(Database.get(e.getGuild().getId()).get(args[1].replace("<", "")
+                        .replace("#", "")
+                        .replace(">", "")).toString().split(" ")).forEach(userId -> {
+                    try {
+                        System.out.println("Clear one UserId: " + userId);
+                        Database.setUser(userId, args[1].replace("<", "")
+                                .replace("#", "")
+                                .replace(">", ""), 0.0, false);
+                        //setting value to 0 of that channel for that users db
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                });
+                //setting value of that channel on server settings to nothing
+                Database.set(e.getGuild().getId(), args[1].replace("<", "")
+                        .replace("#", "")
+                        .replace(">", ""), "", false);
+                System.out.println("End of clear one thread");
 
-        } catch (InterruptedException ex) {
-            ex.printStackTrace();
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
         }
-    }
     };
-
     Thread clearAll = new Thread() {
         @Override
         public void run() {
@@ -55,30 +48,30 @@ public class LeaderBoardAllClearThread{
                 //deleting channels from server settings
                 try {
                     System.out.println(Database.get(e.getGuild().getId()).get("channels"));
-                    Arrays.stream(Database.get(e.getGuild().getId()).get("channels").toString().split(" ")).forEach(channelz->{
-                            System.out.println("Channel: " + channelz);
-                            Document document1;
-                            try {
-                                document1 = Database.get(e.getGuild().getId());
-                            } catch (InterruptedException ex) {
-                                throw new RuntimeException(ex);
-                            }
-                            Document Updatedocument;
-                            try {
-                                Updatedocument = new Document(channelz, Database.get(e.getGuild().getId()).get(channelz));
-                            } catch (InterruptedException ex) {
-                                throw new RuntimeException(ex);
-                            }
+                    Arrays.stream(Database.get(e.getGuild().getId()).get("channels").toString().split(" ")).forEach(channelz -> {
+                        System.out.println("Channel: " + channelz);
+                        Document document1;
+                        try {
+                            document1 = Database.get(e.getGuild().getId());
+                        } catch (InterruptedException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                        Document Updatedocument;
+                        try {
+                            Updatedocument = new Document(channelz, Database.get(e.getGuild().getId()).get(channelz));
+                        } catch (InterruptedException ex) {
+                            throw new RuntimeException(ex);
+                        }
                         System.out.println("Update doc: " + Updatedocument);
-                            Bson updateKey = new Document("$unset", Updatedocument);
-                            Database.collection.updateOne(document1 , updateKey);
-                        });
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
+                        Bson updateKey = new Document("$unset", Updatedocument);
+                        Database.collection.updateOne(document1, updateKey);
+                    });
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
 
                 //deleting user docs
-                Arrays.stream(document.get("users").toString().split(" ")).forEach(user->{
+                Arrays.stream(document.get("users").toString().split(" ")).forEach(user -> {
 
                     try {
                         Database.collection.deleteOne(Database.getUserDoc(user));
@@ -94,4 +87,9 @@ public class LeaderBoardAllClearThread{
             }
         }
     };
+
+    public LeaderBoardAllClearThread(String[] args, MessageReceivedEvent e) {
+        this.args = args;
+        this.e = e;
+    }
 }

@@ -14,7 +14,7 @@ public class giver extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent e) {
         //checking perms
         if (!e.getMember().hasPermission(Permission.ADMINISTRATOR)) return;
-        if(e.getAuthor().equals(Main.jda.getSelfUser())) return;
+        if (e.getAuthor().equals(Main.jda.getSelfUser())) return;
 
 
         String[] args = e.getMessage().getContentRaw().split(" ");
@@ -47,29 +47,29 @@ public class giver extends ListenerAdapter {
                     String amount = args[2];
                     StringBuilder usersBuilder = new StringBuilder();
 
-                    for(int i = 3; i < args.length; i++){
+                    for (int i = 3; i < args.length; i++) {
                         usersBuilder.append("<@")
                                 .append(args[i])
                                 .append(">")
                                 .append(" ");
                     }
 
-                    Arrays.stream(usersBuilder.toString().split(" ")).forEach(userMention ->{
+                    Arrays.stream(usersBuilder.toString().split(" ")).forEach(userMention -> {
                         e.getChannel().sendMessage(String.format(".money add %s %s", amount, userMention)).queue();
                     });
 
-                    e.getChannel().sendMessage(String.format("all users are given %s smiles :), requested Admin: %s", amount,e.getAuthor().getAsMention()))
+                    e.getChannel().sendMessage(String.format("all users are given %s smiles :), requested Admin: %s", amount, e.getAuthor().getAsMention()))
                             .queue();
                     break;
 
                 case "manualGive":
                     //this command will have modified amount for each element, so it's more flexible than the last one but less effiecient
-                     for(int i = 2; i < args.length; i++){
-                         String userMention = "<@" + args[i].split(":")[0]+ ">";
-                         String Manualamount = args[i].split(":")[1] ;
-                         e.getChannel().sendMessage(String.format(".money add %s %s", Manualamount, userMention)).queue();
-                     }
-                     e.getChannel().sendMessage(String.format("all users are given smiles :), requested Admin: %s", e.getAuthor().getAsMention()))
+                    for (int i = 2; i < args.length; i++) {
+                        String userMention = "<@" + args[i].split(":")[0] + ">";
+                        String Manualamount = args[i].split(":")[1];
+                        e.getChannel().sendMessage(String.format(".money add %s %s", Manualamount, userMention)).queue();
+                    }
+                    e.getChannel().sendMessage(String.format("all users are given smiles :), requested Admin: %s", e.getAuthor().getAsMention()))
                             .queue();
                     break;
             }

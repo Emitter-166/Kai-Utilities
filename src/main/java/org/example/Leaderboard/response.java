@@ -5,13 +5,11 @@ import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.bson.Document;
-import org.bson.conversions.Bson;
 
 import java.awt.*;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
 
 public class response extends ListenerAdapter {
     boolean hasSent = false;
@@ -22,7 +20,7 @@ public class response extends ListenerAdapter {
                 .format(DateTimeFormatter.ISO_LOCAL_TIME) + "(EST)";
 
 
-        String args[] = e.getMessage().getContentRaw().split(" ");
+        String[] args = e.getMessage().getContentRaw().split(" ");
         switch (args[0]) {
 
             case ".l":
@@ -165,14 +163,14 @@ public class response extends ListenerAdapter {
                 //commands to clear leaderboard for every channel or just one specific channel
                 if (args.length == 2) {
                     if (!e.getMember().hasPermission(Permission.MODERATE_MEMBERS)) return;
-                    if(!args[1].equalsIgnoreCase("all")){
+                    if (!args[1].equalsIgnoreCase("all")) {
                         e.getMessage().reply("Leader board cleared!")
                                 .mentionRepliedUser(false)
                                 .queue();
                         LeaderBoardAllClearThread leaderBoardAllClearThread = new LeaderBoardAllClearThread(args, e);
                         leaderBoardAllClearThread.clearOne.start();
                         System.out.println("clear one thread running");
-                    }else{
+                    } else {
 
                         LeaderBoardAllClearThread leaderBoardAllClearThread = new LeaderBoardAllClearThread(args, e);
                         leaderBoardAllClearThread.clearAll.start();
@@ -184,7 +182,7 @@ public class response extends ListenerAdapter {
                     }
 
 
-                }else {
+                } else {
                     EmbedBuilder leaderboardUsageBuilder = new EmbedBuilder()
                             .setTitle("Usage of this command: ")
                             .setDescription("`.clear channelMention` \n" +
@@ -196,70 +194,70 @@ public class response extends ListenerAdapter {
                 }
                 break;
 
-                case ".reset":
-                    //setting if the leaderboard should be reset every end of the day and a summary will should be sent
-                        if (args.length != 2) return;
-                        e.getMessage().reply(String.format("Resetting leaderboard every 24 hours is set to %s", args[1]))
-                                .mentionRepliedUser(false)
-                                .queue();
-                        try {
-                            Database.set(e.getGuild().getId(), "reset", Boolean.parseBoolean(args[1]), false);
-                        } catch (InterruptedException ex) {
-                            throw new RuntimeException(ex);
-                        }
-                        break;
-                }
-
-                //sending summary of the day
+            case ".reset":
+                //setting if the leaderboard should be reset every end of the day and a summary will should be sent
+                if (args.length != 2) return;
+                e.getMessage().reply(String.format("Resetting leaderboard every 24 hours is set to %s", args[1]))
+                        .mentionRepliedUser(false)
+                        .queue();
                 try {
-                    if ((boolean) Database.get(e.getGuild().getId()).get("reset"))
-                        if (!hasSent) {
-                            String[] timeArgs = Time.split(":");
-                            if (timeArgs[0].equalsIgnoreCase("00")) {
-                                leaderBoardThread leaderboardThread;
-                                try {
-                                    leaderboardThread = new leaderBoardThread(e, Time, (String) Database.get(e.getGuild().getId()).get("mainChat"));
-                                    leaderboardThread.run();
-                                } catch (InterruptedException ex) {
-                                    throw new RuntimeException(ex);
-                                }
-                                EmbedBuilder leaderboard;
-                                try {
-                                    leaderboard = new EmbedBuilder()
-                                            .setTitle("Summary of today: ")
-                                            .setDescription(leaderboardThread.getWinnersBuilder().toString())
-                                            .setFooter(Time)
-                                            .setColor(Color.WHITE);
-                                } catch (InterruptedException ex) {
-                                    throw new RuntimeException(ex);
-                                }
-                                try {
-                                    String mentionRoleId = (String) Database.get(e.getGuild().getId()).get("roleToMention");
-                                    e.getGuild().getTextChannelById((String) Database.get(e.getGuild().getId()).get("actionChannel")).sendMessageEmbeds(leaderboard.build())
-                                            .content(String.format("%s", e.getGuild().getRoleById(mentionRoleId).getAsMention()))
-                                            .mentionRoles(mentionRoleId)
-                                            .queue();
-
-                                } catch (InterruptedException ex) {
-                                    throw new RuntimeException(ex);
-                                }
-                                Document document = null;
-                                try {
-                                    document = Database.get(e.getGuild().getId());
-                                } catch (InterruptedException exc) {
-                                    throw new RuntimeException(exc);
-                                }
-                                //deleting datas
-                                LeaderBoardAllClearThread allClearThread = new LeaderBoardAllClearThread(args, e);
-                                allClearThread.clearAll.start();
-                                hasSent = true;
-                            } else {
-                                hasSent = false;
-                            }
-                        }
+                    Database.set(e.getGuild().getId(), "reset", Boolean.parseBoolean(args[1]), false);
                 } catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
                 }
+                break;
+        }
+
+        //sending summary of the day
+        try {
+            if ((boolean) Database.get(e.getGuild().getId()).get("reset"))
+                if (!hasSent) {
+                    String[] timeArgs = Time.split(":");
+                    if (timeArgs[0].equalsIgnoreCase("00")) {
+                        leaderBoardThread leaderboardThread;
+                        try {
+                            leaderboardThread = new leaderBoardThread(e, Time, (String) Database.get(e.getGuild().getId()).get("mainChat"));
+                            leaderboardThread.run();
+                        } catch (InterruptedException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                        EmbedBuilder leaderboard;
+                        try {
+                            leaderboard = new EmbedBuilder()
+                                    .setTitle("Summary of today: ")
+                                    .setDescription(leaderboardThread.getWinnersBuilder().toString())
+                                    .setFooter(Time)
+                                    .setColor(Color.WHITE);
+                        } catch (InterruptedException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                        try {
+                            String mentionRoleId = (String) Database.get(e.getGuild().getId()).get("roleToMention");
+                            e.getGuild().getTextChannelById((String) Database.get(e.getGuild().getId()).get("actionChannel")).sendMessageEmbeds(leaderboard.build())
+                                    .content(String.format("%s", e.getGuild().getRoleById(mentionRoleId).getAsMention()))
+                                    .mentionRoles(mentionRoleId)
+                                    .queue();
+
+                        } catch (InterruptedException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                        Document document = null;
+                        try {
+                            document = Database.get(e.getGuild().getId());
+                        } catch (InterruptedException exc) {
+                            throw new RuntimeException(exc);
+                        }
+                        //deleting datas
+                        LeaderBoardAllClearThread allClearThread = new LeaderBoardAllClearThread(args, e);
+                        allClearThread.clearAll.start();
+                        hasSent = true;
+                    } else {
+                        hasSent = false;
+                    }
+                }
+        } catch (InterruptedException ex) {
+            throw new RuntimeException(ex);
         }
     }
+}
 

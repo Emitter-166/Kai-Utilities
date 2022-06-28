@@ -16,6 +16,7 @@ import javax.security.auth.login.LoginException;
 
 public class Main {
     public static JDA jda;
+
     public static void main(String[] args) throws LoginException {
         jda = JDABuilder.createLight(System.getenv("token")) //token will go here
                 .enableIntents(GatewayIntent.GUILD_MEMBERS) //enabling intents

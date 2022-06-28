@@ -12,17 +12,18 @@ import java.util.Objects;
 public class setup extends ListenerAdapter {
 
     @Override
-    public void onMessageReceived(MessageReceivedEvent e){
-       try{
-           if(!Objects.requireNonNull(e.getMember(), "message didn't happen in a guild").hasPermission(Permission.ADMINISTRATOR)) return;
-           //checking if the user who requested have admin perms
-       }catch (NullPointerException exception){
-           return;
-       }
+    public void onMessageReceived(MessageReceivedEvent e) {
+        try {
+            if (!Objects.requireNonNull(e.getMember(), "message didn't happen in a guild").hasPermission(Permission.ADMINISTRATOR))
+                return;
+            //checking if the user who requested have admin perms
+        } catch (NullPointerException exception) {
+            return;
+        }
 
         String[] args = e.getMessage().getContentRaw().split(" "); //splits the message into args for ease of use
 
-        switch (args[0]){
+        switch (args[0]) {
             case "$help":
                 //help command for role logging
                 EmbedBuilder helpBuilder = new EmbedBuilder()
@@ -54,7 +55,7 @@ public class setup extends ListenerAdapter {
                         .mentionRepliedUser(false)
                         .queue();
                 StringBuilder roleIdBuilder = new StringBuilder();
-                for(int i = 1; i < args.length; i++){
+                for (int i = 1; i < args.length; i++) {
                     //getting roles from all the message args except first one (which is our command)
                     roleIdBuilder.append(args[i]).append("-");
                 }
@@ -96,7 +97,7 @@ public class setup extends ListenerAdapter {
                         .queue();
                 try {
                     StringBuilder roleToRemove = new StringBuilder();
-                    for(int i = 1; i < args.length; i++){
+                    for (int i = 1; i < args.length; i++) {
                         roleToRemove.append(args[i]);
                     }
                     Database.set(e.getGuild().getId(), "sensitiveRoles", Database.get(e.getGuild().getId()).get("sensitiveRoles").toString().replace(args[1] + "-", ""), false);
@@ -111,7 +112,7 @@ public class setup extends ListenerAdapter {
                         .mentionRepliedUser(false)
                         .queue();
                 try {
-                    Database.set(e.getGuild().getId(), "ignoreBot", Boolean.parseBoolean(args[1]),false);
+                    Database.set(e.getGuild().getId(), "ignoreBot", Boolean.parseBoolean(args[1]), false);
                 } catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -122,7 +123,7 @@ public class setup extends ListenerAdapter {
                 StringBuilder sensitiveRoles = new StringBuilder();
                 Arrays.stream(Database.get(e.getGuild().getId()).get("sensitiveRoles").toString().split(" ")) //retrieving sensitive roles from database, and splitting it.
                         .forEach(roleName -> {
-                            if(!Objects.equals(roleName, "")) //checks if roleName is empty, null protection
+                            if (!Objects.equals(roleName, "")) //checks if roleName is empty, null protection
                                 sensitiveRoles.append(e.getGuild().getRolesByName(roleName, false).get(0).getAsMention());
                         });
                 EmbedBuilder configBuilder = new EmbedBuilder()
@@ -131,9 +132,9 @@ public class setup extends ListenerAdapter {
                         .setColor(Color.black)
                         .setDescription("" +
                                 String.format("**Sensitive roles: %s** \n" +
-                                        "**Role to ping: %s** \n" +
-                                        "**Logging channel: <#%s> ** \n" +
-                                        "**ignore bot?** `%s`", sensitiveRoles,
+                                                "**Role to ping: %s** \n" +
+                                                "**Logging channel: <#%s> ** \n" +
+                                                "**ignore bot?** `%s`", sensitiveRoles,
                                         e.getGuild().getRolesByName(Database.get(e.getGuild().getId()).get("roleToPing").toString(), false).get(0),
                                         Database.get(e.getGuild().getId()).get("loggingChannel").toString(), Database.get(e.getGuild().getId()).get("ignoreBot")));
 
