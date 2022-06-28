@@ -13,7 +13,8 @@ public class Help extends ListenerAdapter {
                 EmbedBuilder helpBuilder = new EmbedBuilder()
                         .setTitle("Help commands for Kai Utilities")
                         .setDescription("`.l help` **Help commands for leaderboards** \n" +
-                                "`$help` **help commands for role activity logging** \n");
+                                "`$help` **help commands for role activity logging** \n" +
+                                "`.smileGiver help` **see help commands for bulk smile giver**");
 
                 e.getMessage().replyEmbeds(helpBuilder.build())
                         .mentionRepliedUser(false)

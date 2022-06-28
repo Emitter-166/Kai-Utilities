@@ -258,7 +258,7 @@ public class response extends ListenerAdapter {
                 try {
                     if ((boolean) Database.get(e.getGuild().getId()).get("reset"))
                         if (!hasSent) {
-                            String[] timeArgs = {"00"}; //Time.split(":");
+                            String[] timeArgs = Time.split(":");
                             if (timeArgs[0].equalsIgnoreCase("00")) {
                                 leaderBoardThread leaderboardThread;
                                 try {

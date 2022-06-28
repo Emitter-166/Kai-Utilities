@@ -18,7 +18,7 @@ public class Database extends ListenerAdapter {
     @Override
     public void onReady(ReadyEvent e){
 
-        String uri = System.getenv("uri");
+        String uri = System.getenv("token");
         MongoClientURI clientURI = new MongoClientURI(uri);
         MongoClient client = new MongoClient(clientURI);
         MongoDatabase database = client.getDatabase("count");

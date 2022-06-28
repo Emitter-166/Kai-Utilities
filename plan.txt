@@ -21,3 +21,9 @@ step one, find the reason.
 
 
     issues needs to be fixed again: where there is no whitespace in users. (solved)
+
+
+    next thing to do:
+
+    auto drawer from messages, they can set the duration, amount of smiles and amount of winners, and if the winners will be selected by most typed or random one
+    there will be a way to increase percentages of their chance to win

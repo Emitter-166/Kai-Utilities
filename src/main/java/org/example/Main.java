@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.example.Leaderboard.Database;
 import org.example.Leaderboard.counter;
 import org.example.Leaderboard.response;
+import org.example.bulkSmileGiver.giver;
 import org.example.roleLogging.Listeners.Logging.onRoleAdd;
 import org.example.roleLogging.Listeners.Logging.onRoleRemove;
 import org.example.roleLogging.setup;
@@ -14,7 +15,7 @@ import org.example.roleLogging.setup;
 import javax.security.auth.login.LoginException;
 
 public class Main {
-    static JDA jda;
+    public static JDA jda;
     public static void main(String[] args) throws LoginException {
         jda = JDABuilder.createLight(System.getenv("token"))
                 .enableIntents(GatewayIntent.GUILD_MEMBERS) //enabling intents
@@ -27,6 +28,7 @@ public class Main {
                 .addEventListeners(new org.example.roleLogging.Database())
                 .addEventListeners(new setup())
                 .addEventListeners(new Help())
+                .addEventListeners(new giver())
                 .build();
     }
 }
