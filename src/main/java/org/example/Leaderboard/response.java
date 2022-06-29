@@ -14,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 public class response extends ListenerAdapter {
     boolean hasSent = false;
 
-
+    public LeaderBoardAllClearThread leaderBoardAllClearThread;
     public void onMessageReceived(MessageReceivedEvent e) {
         String Time = ZonedDateTime.now(ZoneId.of("America/New_York")) //getting EST time
                 .format(DateTimeFormatter.ISO_LOCAL_TIME) + "(EST)";
@@ -140,17 +140,19 @@ public class response extends ListenerAdapter {
             case ".messages":
                 //retrieves message counts and send it to the channel
                 if (args.length == 1) {
-                    try {
-                        e.getMessage().reply(String.format("You have a total of %s messages today!", Math.floor((Double) Database.getUser(e.getAuthor().getId(), "counted"))))
+                    e.getMessage().reply("**usage:** `.messages channelMention` \n" +
+                                    "**Example:** `.messages `<#880331517291794442>")
                                 .mentionRepliedUser(false)
                                 .queue();
-                    } catch (InterruptedException ex) {
-                        throw new RuntimeException(ex);
-                    }
+
                 } else if (args.length == 2) {
                     try {
-                        e.getMessage().reply(String.format("%s have a total of %s messages today!",
-                                        e.getGuild().retrieveMemberById(args[1]).complete().getAsMention(), Math.floor((Double) Database.getUser(args[1], "counted"))))
+                        e.getMessage().reply(String.format("You have a total of %s messages on %s today (EST)"
+                                        , Math.floor((Double) Database.getUser(e.getAuthor().getId(),
+                                                args[1].replace("<", "")
+                                                .replace("#", "")
+                                                .replace(">", ""))), args[1]))
+
                                 .mentionRepliedUser(false)
                                 .queue();
                     } catch (Exception ex) {
@@ -167,12 +169,11 @@ public class response extends ListenerAdapter {
                         e.getMessage().reply("Leader board cleared!")
                                 .mentionRepliedUser(false)
                                 .queue();
-                        LeaderBoardAllClearThread leaderBoardAllClearThread = new LeaderBoardAllClearThread(args, e);
+                        leaderBoardAllClearThread = new LeaderBoardAllClearThread(args, e);
                         leaderBoardAllClearThread.clearOne.start();
                         System.out.println("clear one thread running");
                     } else {
-
-                        LeaderBoardAllClearThread leaderBoardAllClearThread = new LeaderBoardAllClearThread(args, e);
+                        leaderBoardAllClearThread = new LeaderBoardAllClearThread(args, e);
                         leaderBoardAllClearThread.clearAll.start();
                         System.out.println("clear All thread running");
                         e.getMessage().reply("Leader board cleared!")

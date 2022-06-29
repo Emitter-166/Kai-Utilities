@@ -5,13 +5,23 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 
 import java.util.Arrays;
+import java.util.Objects;
+
+import static org.example.Leaderboard.Database.cleanerRunning;
 
 public class LeaderBoardAllClearThread {
     String[] args;
     MessageReceivedEvent e;
+
     Thread clearOne = new Thread() {
         @Override
         public void run() {
+            try {
+                Database.databaseOperationRunning.await();
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
+            cleanerRunning = true;
             try {
                 System.out.println("clear one running");
                 Arrays.stream(Database.get(e.getGuild().getId()).get(args[1].replace("<", "")
@@ -35,11 +45,20 @@ public class LeaderBoardAllClearThread {
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
             }
+
+            clearOne.interrupt();
+            cleanerRunning = false;
         }
     };
     Thread clearAll = new Thread() {
         @Override
         public void run() {
+            cleanerRunning = true;
+            try {
+                Database.databaseOperationRunning.await();
+            } catch (InterruptedException ex) {
+                throw new RuntimeException(ex);
+            }
             //this thread is to clear everything in the database and only keep server settings
             try {
                 System.out.println("Clear all running");
@@ -71,8 +90,15 @@ public class LeaderBoardAllClearThread {
                 Arrays.stream(document.get("users").toString().split(" ")).forEach(user -> {
 
                     try {
-                        Database.collection.deleteOne(Database.getUserDoc(user));
+                        if(Database.getUserDoc(user) != null){
+                            try {
+                                Database.collection.deleteOne(Objects.requireNonNull(Database.getUserDoc(user), "user is null"));
+                            } catch (InterruptedException ex) {
+
+                            }
+                        }
                     } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
                     }
                 });
                 Database.set(e.getGuild().getId(), "channels", "", false);
@@ -81,6 +107,8 @@ public class LeaderBoardAllClearThread {
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
             }
+            clearAll.interrupt();
+            cleanerRunning = false;
         }
     };
 
@@ -88,4 +116,5 @@ public class LeaderBoardAllClearThread {
         this.args = args;
         this.e = e;
     }
+
 }

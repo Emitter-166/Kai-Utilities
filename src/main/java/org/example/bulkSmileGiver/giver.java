@@ -28,14 +28,14 @@ public class giver extends ListenerAdapter {
                             .addField("How to use it?",
                                     "`.smileGiver bulkGive amount userIds(separated by whitespace)` \n" +
                                             "example: `.smileGiver bulkGive 250 861321408357072937 908167053192626196 671016674668838952 857426474704830465` \n" +
-                                            "\n" +
-                                            "`.smileGiver manualGive userId:amount (separated by whitespace)` **for each users it will give unique amount of smiles** \n" +
-                                            "example: `.smileGiver manualGive 861321408357072937:300 908167053192626196:700 671016674668838952:3034 857426474704830465:260` \n", false)
+                                            "Note: **You can explicitly set an users amount by doing** `userId:amount` **with the user id**\n" +
+                                            "example: `.smileGiver bulkGive 250 861321408357072937:300 908167053192626196 671016674668838952 857426474704830465` \n" +
+                                            "It will give the first user 300 smiles instead of 250, it can be done with any users", false)
                             .setDescription("**Commands:** \n" +
                                     "note: every command of this feature starts with `.smileGiver`, every command included here must have this at first \n" +
                                     "\n" +
-                                    "`bulkGive amount userIds` **Give smile to multiple users, usage above** \n" +
-                                    "`manualGive userId:amount` **it will ask you the amount for each user, easier** \n");
+                                    "`bulkGive amount userIds` **Give smile to multiple users, usage below** \n" +
+                                    " \n");
 
                     e.getChannel().sendMessageEmbeds(helpBuilder.build())
                             .mentionRepliedUser(false)
@@ -47,29 +47,30 @@ public class giver extends ListenerAdapter {
                     String amount = args[2];
                     StringBuilder usersBuilder = new StringBuilder();
 
+
                     for (int i = 3; i < args.length; i++) {
-                        usersBuilder.append("<@")
-                                .append(args[i])
-                                .append(">")
-                                .append(" ");
+
+                       if(args[i].split(":").length == 1){
+                           usersBuilder.append("<@")
+                                   .append(args[i])
+                                   .append(">")
+                                   .append(" ");
+                       }else if(args[i].split(":").length == 2){
+                           usersBuilder.append("<@")
+                                   .append(args[i].split(":")[0])
+                                   .append(">")
+                                   .append(":")
+                                   .append(args[i].split(":")[1])
+                                   .append(" ");
+                       }
                     }
 
                     Arrays.stream(usersBuilder.toString().split(" ")).forEach(userMention -> {
-                        e.getChannel().sendMessage(String.format(".money add %s %s", amount, userMention)).queue();
+                         String tempAmount = userMention.split(":").length == 2 ? userMention.split(":")[1] : amount;
+                        e.getChannel().sendMessage(String.format(".money add %s %s", tempAmount, userMention.split(":")[0])).queue();
                     });
 
                     e.getChannel().sendMessage(String.format("all users are given %s smiles :), requested Admin: %s", amount, e.getAuthor().getAsMention()))
-                            .queue();
-                    break;
-
-                case "manualGive":
-                    //this command will have modified amount for each element, so it's more flexible than the last one but less effiecient
-                    for (int i = 2; i < args.length; i++) {
-                        String userMention = "<@" + args[i].split(":")[0] + ">";
-                        String Manualamount = args[i].split(":")[1];
-                        e.getChannel().sendMessage(String.format(".money add %s %s", Manualamount, userMention)).queue();
-                    }
-                    e.getChannel().sendMessage(String.format("all users are given smiles :), requested Admin: %s", e.getAuthor().getAsMention()))
                             .queue();
                     break;
             }

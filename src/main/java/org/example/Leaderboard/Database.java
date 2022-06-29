@@ -11,9 +11,12 @@ import org.bson.conversions.Bson;
 
 import java.util.Arrays;
 import java.util.NoSuchElementException;
+import java.util.concurrent.CountDownLatch;
 
 public class Database extends ListenerAdapter {
     public static MongoCollection collection;
+    public static boolean cleanerRunning = false;
+    public static CountDownLatch databaseOperationRunning = new CountDownLatch(0); //these 2 variables are sync system
 
     public static void set(String Id, String Key, Object value, boolean isAdd) throws InterruptedException {
         //a method that will update/create/set server settings
