@@ -24,7 +24,6 @@ public class LeaderBoardAllClearThread {
                                 .replace(">", ""), 0.0, false);
                         //setting value to 0 of that channel for that users db
                     } catch (InterruptedException ex) {
-                        throw new RuntimeException(ex);
                     }
                 });
                 //setting value of that channel on server settings to nothing
@@ -50,17 +49,15 @@ public class LeaderBoardAllClearThread {
                     System.out.println(Database.get(e.getGuild().getId()).get("channels"));
                     Arrays.stream(Database.get(e.getGuild().getId()).get("channels").toString().split(" ")).forEach(channelz -> {
                         System.out.println("Channel: " + channelz);
-                        Document document1;
+                        Document document1 = null;
                         try {
                             document1 = Database.get(e.getGuild().getId());
                         } catch (InterruptedException ex) {
-                            throw new RuntimeException(ex);
                         }
-                        Document Updatedocument;
+                        Document Updatedocument = null;
                         try {
                             Updatedocument = new Document(channelz, Database.get(e.getGuild().getId()).get(channelz));
                         } catch (InterruptedException ex) {
-                            throw new RuntimeException(ex);
                         }
                         System.out.println("Update doc: " + Updatedocument);
                         Bson updateKey = new Document("$unset", Updatedocument);
@@ -76,7 +73,6 @@ public class LeaderBoardAllClearThread {
                     try {
                         Database.collection.deleteOne(Database.getUserDoc(user));
                     } catch (InterruptedException ex) {
-                        throw new RuntimeException(ex);
                     }
                 });
                 Database.set(e.getGuild().getId(), "channels", "", false);
