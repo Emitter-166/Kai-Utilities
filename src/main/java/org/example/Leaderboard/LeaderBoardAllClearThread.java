@@ -6,6 +6,7 @@ import org.bson.conversions.Bson;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.example.Leaderboard.Database.cleanerRunning;
 
@@ -16,14 +17,18 @@ public class LeaderBoardAllClearThread {
     Thread clearOne = new Thread() {
         @Override
         public void run() {
+            cleanerRunning = true;
             try {
                 Database.databaseOperationRunning.await();
             } catch (InterruptedException ex) {
                 throw new RuntimeException(ex);
             }
-            cleanerRunning = true;
             try {
                 System.out.println("clear one running");
+                System.out.println(Arrays.toString(Database.get(e.getGuild().getId()).get(args[1].replace("<", "")
+                        .replace("#", "")
+                        .replace(">", "")).toString().split(" ")));
+
                 Arrays.stream(Database.get(e.getGuild().getId()).get(args[1].replace("<", "")
                         .replace("#", "")
                         .replace(">", "")).toString().split(" ")).forEach(userId -> {
@@ -45,10 +50,10 @@ public class LeaderBoardAllClearThread {
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
             }
-
-            clearOne.interrupt();
             cleanerRunning = false;
+            clearOne.interrupt();
         }
+
     };
     Thread clearAll = new Thread() {
         @Override
@@ -85,10 +90,11 @@ public class LeaderBoardAllClearThread {
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
-
+                AtomicInteger userCount = new AtomicInteger();
                 //deleting user docs
                 Arrays.stream(document.get("users").toString().split(" ")).forEach(user -> {
-
+                    userCount.getAndIncrement();
+                    System.out.println(userCount + ". "+user);
                     try {
                         if(Database.getUserDoc(user) != null){
                             try {
@@ -107,8 +113,9 @@ public class LeaderBoardAllClearThread {
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
             }
-            clearAll.interrupt();
             cleanerRunning = false;
+            clearAll.interrupt();
+
         }
     };
 

@@ -10,12 +10,34 @@ import java.awt.*;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.CountDownLatch;
 
 public class response extends ListenerAdapter {
     boolean hasSent = false;
+    boolean shouldReset;
+    int messages = 0; //there is some error while retrieving reset value from database, so we will only retrieve it after 100 messages
+    CountDownLatch retrieved = new CountDownLatch(0);
 
     public LeaderBoardAllClearThread leaderBoardAllClearThread;
     public void onMessageReceived(MessageReceivedEvent e) {
+        messages++;
+        Thread retrieveShouldReset = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                retrieved = new CountDownLatch(1);
+                if(messages >= 100){
+                   try {
+                       shouldReset = (boolean) Database.get(e.getGuild().getId()).get("reset");
+                   } catch (InterruptedException ex) {
+                       throw new RuntimeException(ex);
+                   }
+                   messages = 0;
+                }
+                retrieved.countDown();
+            }
+
+        });
+        retrieveShouldReset.start();
         String Time = ZonedDateTime.now(ZoneId.of("America/New_York")) //getting EST time
                 .format(DateTimeFormatter.ISO_LOCAL_TIME) + "(EST)";
 
@@ -211,9 +233,11 @@ public class response extends ListenerAdapter {
 
         //sending summary of the day
         try {
-            if ((boolean) Database.get(e.getGuild().getId()).get("reset"))
-                if (!hasSent) {
-                    String[] timeArgs = Time.split(":");
+            String[] timeArgs = Time.split(":");
+            if (!hasSent) {
+                retrieved.await();
+                retrieveShouldReset.interrupt();
+                if (shouldReset) {
                     if (timeArgs[0].equalsIgnoreCase("00")) {
                         leaderBoardThread leaderboardThread;
                         try {
@@ -252,10 +276,13 @@ public class response extends ListenerAdapter {
                         LeaderBoardAllClearThread allClearThread = new LeaderBoardAllClearThread(args, e);
                         allClearThread.clearAll.start();
                         hasSent = true;
-                    } else {
-                        hasSent = false;
                     }
                 }
+            }
+            if (!timeArgs[0].equalsIgnoreCase("00")){
+                hasSent = false;
+            }
+
         } catch (InterruptedException ex) {
             throw new RuntimeException(ex);
         }

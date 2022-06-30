@@ -12,6 +12,7 @@ public class counter extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent e) {
         if(Database.cleanerRunning) {
             System.out.println("Cleaner running, can't perform this operation, code: " + e.getMember().getEffectiveName());
+            databaseOperationRunning.countDown();
             return; //sync system so database doesn't get corrupted while cleaning
 
         }
