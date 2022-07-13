@@ -7,7 +7,35 @@ import java.util.concurrent.CountDownLatch;
 
 import static org.example.Leaderboard.Database.databaseOperationRunning;
 
+class upDater implements Runnable{
+    CountDownLatch databaseOperationRunning;
+    MessageReceivedEvent e;
+    String id;
 
+    public upDater(CountDownLatch databaseOperationRunning, MessageReceivedEvent e, String id) {
+        this.databaseOperationRunning = databaseOperationRunning;
+        this.e = e;
+        this.id = id;
+    }
+
+    @Override
+    public void run() {
+        try {
+            /*
+            here we add every necessary variables to database when MessageReceived event is triggered
+            in the first line we used Math.random to salt the value in order to keep values from
+            matching each other, it will come in use in LeaderBoardThread
+             */
+            Database.setUser(e.getAuthor().getId(), e.getChannel().getId(), 1 + Math.random(), true);
+            Database.set(id, "channels", e.getChannel().getId() + " ", true);
+            Database.set(id, e.getChannel().getId(), e.getAuthor().getId() + " ", true);
+            Database.set(id, "users", e.getAuthor().getId() + " ", true);
+            databaseOperationRunning.countDown();
+        } catch (InterruptedException ex) {
+            throw new RuntimeException(ex);
+        }
+    }
+}
 public class counter extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent e) {
         if(Database.cleanerRunning) {
@@ -23,19 +51,8 @@ public class counter extends ListenerAdapter {
         }
         String id = e.getGuild().getId();
 
-        try {
-            /*
-            here we add every necessary variables to database when MessageReceived event is triggered
-            in the first line we used Math.random to salt the value in order to keep values from
-            matching each other, it will come in use in LeaderBoardThread
-             */
-            Database.setUser(e.getAuthor().getId(), e.getChannel().getId(), 1 + Math.random(), true);
-            Database.set(id, "channels", e.getChannel().getId() + " ", true);
-            Database.set(id, e.getChannel().getId(), e.getAuthor().getId() + " ", true);
-            Database.set(id, "users", e.getAuthor().getId() + " ", true);
-            databaseOperationRunning.countDown();
-        } catch (InterruptedException ex) {
-            throw new RuntimeException(ex);
-        }
+       upDater upDater = new upDater(databaseOperationRunning, e, id);
+       Thread thread = new Thread(upDater);
+       thread.start();
     }
 }

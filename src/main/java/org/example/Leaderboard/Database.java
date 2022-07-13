@@ -4,6 +4,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.bson.Document;
@@ -32,12 +33,14 @@ public class Database extends ListenerAdapter {
     public static Document get(String Id) throws InterruptedException {
         //method to get server settings from db
         try {
-            return (Document) collection.find(new Document("serverId", Id)).cursor().next();
+           // return (Document) collection.find(new Document("serverId", Id)).cursor().next();
+            return (Document) collection.find(Filters.eq("serverId", Id)).first();
         } catch (NoSuchElementException exception) {
             System.out.println("No DB");
             createDB(Id); //it will create server settings document if needed
             Thread.sleep(200);
-            return (Document) collection.find(new Document("serverId", Id)).cursor().next();
+            //return (Document) collection.find(new Document("serverId", Id)).cursor().next();
+            return (Document) collection.find(Filters.eq("serverId", Id)).first();
         }
 
     }

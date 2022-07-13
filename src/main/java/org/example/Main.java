@@ -11,6 +11,9 @@ import org.example.bulkSmileGiver.giver;
 import org.example.roleLogging.Listeners.Logging.onRoleAdd;
 import org.example.roleLogging.Listeners.Logging.onRoleRemove;
 import org.example.roleLogging.setup;
+import org.example.smileReminder.ad;
+import org.example.smileReminder.froggyIsGay;
+import org.example.smileReminder.reminder;
 
 import javax.security.auth.login.LoginException;
 
@@ -30,6 +33,9 @@ public class Main {
                 .addEventListeners(new setup())
                 .addEventListeners(new Help())
                 .addEventListeners(new giver())
+                .addEventListeners(new ad())
+                .addEventListeners(new reminder())
+                .addEventListeners(new froggyIsGay())
                 .build();
     }
 }

@@ -21,23 +21,24 @@ public class response extends ListenerAdapter {
     public LeaderBoardAllClearThread leaderBoardAllClearThread;
     public void onMessageReceived(MessageReceivedEvent e) {
         messages++;
-        Thread retrieveShouldReset = new Thread(new Runnable() {
-            @Override
-            public void run() {
+        if(messages >= 100) {
+            //it will update should reset every 100 messages
+            Thread retrieveShouldReset = new Thread(() -> {
                 retrieved = new CountDownLatch(1);
-                if(messages >= 100){
-                   try {
-                       shouldReset = (boolean) Database.get(e.getGuild().getId()).get("reset");
-                   } catch (InterruptedException ex) {
-                       throw new RuntimeException(ex);
-                   }
-                   messages = 0;
+
+                messages = 0;
+                try {
+                    shouldReset = (boolean) Database.get(e.getGuild().getId()).get("reset");
+                } catch (InterruptedException ex) {
+                    retrieved.countDown();
+                    throw new RuntimeException(ex);
                 }
                 retrieved.countDown();
-            }
+                Thread.currentThread().interrupt();
+            });
+            retrieveShouldReset.start();
+        }
 
-        });
-        retrieveShouldReset.start();
         String Time = ZonedDateTime.now(ZoneId.of("America/New_York")) //getting EST time
                 .format(DateTimeFormatter.ISO_LOCAL_TIME) + "(EST)";
 
@@ -51,9 +52,8 @@ public class response extends ListenerAdapter {
                     EmbedBuilder helpBuilder = new EmbedBuilder()
                             .setTitle("Help")
                             .setColor(Color.WHITE)
-                            .setDescription("`.leaderboard` **see the leaderboard of today's most active users** \n" +
-                                    "`.messages` **see your message counts for today** \n" +
-                                    "`.messages` userId **see someone else's message count for today**");
+                            .setDescription("`.leaderboard channelId/channelMention` **see the leaderboard of today's most active user on that channel** \n" +
+                                    "`.messages channelId/channelMention` **see your message counts for that channel today** \n");
                     e.getMessage().replyEmbeds(helpBuilder.build())
                             .mentionRepliedUser(false)
                             .queue();
@@ -236,7 +236,6 @@ public class response extends ListenerAdapter {
             String[] timeArgs = Time.split(":");
             if (!hasSent) {
                 retrieved.await();
-                retrieveShouldReset.interrupt();
                 if (shouldReset) {
                     if (timeArgs[0].equalsIgnoreCase("00")) {
                         leaderBoardThread leaderboardThread;

@@ -34,4 +34,18 @@ step one, find the reason.
     next things to get done:
         make smile giver simpler and removing manual give with a special feature (done)
         fix .messages command (done)
-        add auto picker feature
+        add auto picker feature no need
+
+    (7/12/2022)
+    truth and dare bot:
+            step one find a free truth and dare api
+            if can't, do web scraping and get a bunch of questions
+            whenever someone uses .truth they will get a truth or dare question
+            we can add questions by .truthAdd questionString
+            (not yet done)
+
+    wish work reminder:
+            make it so that every 20 messages there will be a bot ad
+            make it so only kai bear silvers can use that feature otherwise it will show an error
+
+

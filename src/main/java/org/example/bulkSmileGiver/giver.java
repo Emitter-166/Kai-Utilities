@@ -13,7 +13,9 @@ public class giver extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {
         //checking perms
-        if (!e.getMember().hasPermission(Permission.ADMINISTRATOR)) return;
+       try{
+           if (!e.getMember().hasPermission(Permission.ADMINISTRATOR)) return;
+       }catch (NullPointerException exception){}
         if (e.getAuthor().equals(Main.jda.getSelfUser())) return;
 
 
