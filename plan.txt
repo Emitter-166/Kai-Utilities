@@ -47,5 +47,38 @@ step one, find the reason.
     wish work reminder:
             make it so that every 20 messages there will be a bot ad
             make it so only kai bear silvers can use that feature otherwise it will show an error
+            (done)
+
+    20-80 percent statistics:
+    find out which percent of the users makes up most of the engagements
+    it will store the amount of messages there is in one week, in total and for individual users.
+    also there will be a user count of how many people have talked in one week.
+    .stats command will show what percentage of user talks and what percentage from that
+    makes up most of the engagement, total amount of messages that week, average messages per user, amount of users.
+
+    basically calculate how many percentages of the user is generating 80 percent of the results
+
+    database variables:
+        server:
+            users:
+            total amount of users who talked: (totalUsers)
+            messages:
+            role to mention:
+            channel to send report to:
+
+        user:
+            total messages this week:
+
+
+        calculation process:
+            step1: divide messages by users and get average messages per users
+            step2:
+
+
+
+        embed will look like this:
+            80% messages sent by:
+            Total amount of messages this week:
+            Average amount of messages
 
 

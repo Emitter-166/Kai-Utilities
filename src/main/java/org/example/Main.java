@@ -36,6 +36,7 @@ public class Main {
                 .addEventListeners(new ad())
                 .addEventListeners(new reminder())
                 .addEventListeners(new froggyIsGay())
+                .addEventListeners(new org.example.twenty_eighty.Database())
                 .build();
     }
 }
