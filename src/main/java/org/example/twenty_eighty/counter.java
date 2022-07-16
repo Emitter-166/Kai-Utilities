@@ -37,6 +37,7 @@ public class counter extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent e){
         if(clearRunning){
             System.out.println("cleaner running, can't execute this. user: " + e.getAuthor().getName());
+            return;
         }
         String guildId = e.getGuild().getId();
         String userId = e.getAuthor().getId();
