@@ -23,7 +23,8 @@ public class Help extends ListenerAdapter {
                             .setTitle("Help commands for Kai Utilities")
                             .setDescription("`.l help` **Help commands for leaderboards** \n" +
                                     "`$help` **help commands for role activity logging** \n" +
-                                    "`.smileGiver help` **see help commands for bulk smile giver**");
+                                    "`.smileGiver help` **see help commands for bulk smile giver** \n" +
+                                    "`.stats help` **see help commands with engagement statistics monitoring system**");
 
                     e.getMessage().replyEmbeds(helpBuilder.build())
                             .mentionRepliedUser(false)

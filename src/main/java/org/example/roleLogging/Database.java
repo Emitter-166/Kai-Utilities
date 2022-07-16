@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.example.token;
 
 import java.util.NoSuchElementException;
 
@@ -64,7 +65,7 @@ public class Database extends ListenerAdapter {
     @Override
     public void onReady(ReadyEvent e) {
         //it will update collection everytime bot starts up
-        String uri = System.getenv("uri"); //Mongo DB uri
+        String uri = token.getUri(); //Mongo DB uri
         MongoClientURI clientURI = new MongoClientURI(uri);
         MongoClient client = new MongoClient(clientURI);
         MongoDatabase database = client.getDatabase("roleLogging"); //getting database and collection

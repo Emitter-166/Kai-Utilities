@@ -8,45 +8,74 @@ import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.bson.Document;
 import org.bson.conversions.Bson;
+import org.example.token;
 
 import java.util.NoSuchElementException;
 
 public class Database extends ListenerAdapter {
     public static MongoCollection<Document> collection;
 
-    public static void set(String Id, String Key, Object value, boolean isAdd) throws InterruptedException {
+    //sync variables
+    public static boolean clearRunning = false;
+
+
+    public static void set(String Id, String field,  String Key, Object value, boolean isAdd) throws InterruptedException {
         //for ease of understanding while coding, this method is added, there is no real use of it
-        updateDB(Id, Key, value, isAdd);
+        updateDB(Id, field, Key, value, isAdd);
     }
 
-    public static Document get(String Id, String field) {
+    public static Document get(String Id, String field) throws InterruptedException {
         //it will return server settings from database collection
-       return collection.find(new Document(field, Id)).cursor().next();
+       try{
+           return collection.find(new Document(field, Id)).cursor().next();
+       }catch (NoSuchElementException exception){
+           if(field.equalsIgnoreCase("serverId")){
+               createDB(Id);
+           }else{
+               createUserDB(Id);
+           }
+           Thread.sleep(200);
+           return collection.find(new Document(field, Id)).cursor().next();
+       }
+
     }
 
     private static void createDB(String Id) {
         //server config, here is the template used to make new settings document on db collection
         Document document = new Document("serverId", Id)
                 .append("users", "")
-                .append("totalUsers", 0)
                 .append("messages", 0)
                 .append("roleToMention", "")
-                .append("actionChannel", "");
+                .append("actionChannel", "")
+                .append("isSummarySend", false);
 
         collection.insertOne(document);
 
     }
+    private static void createUserDB(String Id) {
+        //user config, here is the template used to make new settings document on db collection
+        Document document = new Document("userId", Id)
+                .append("total", 0);
+        collection.insertOne(document);
 
-    private static void updateDB(String Id, String key, Object value, boolean isAdd) throws InterruptedException {
+    }
+
+
+    private static void updateDB(String Id, String field, String key, Object value, boolean isAdd) throws InterruptedException {
         //for server
         Document document = null;
         try {
             //it will try to assign value to document, if there is no server settings for role logging, it will create one
-            document = collection.find(new Document("serverId", Id)).cursor().next();
+            document = collection.find(new Document(field, Id)).cursor().next();
         } catch (NoSuchElementException exception) {
-            createDB(Id);
+            if(field.equalsIgnoreCase("serverId")){
+                createDB(Id);
+            }else{
+                createUserDB(Id);
+            }
+
             Thread.sleep(200);
-            document = collection.find(new Document("serverId", Id)).cursor().next();
+            document = collection.find(new Document(field, Id)).cursor().next();
         }
 
         if (!isAdd) {
@@ -55,9 +84,8 @@ public class Database extends ListenerAdapter {
             Bson updateKey = new Document("$set", Updatedocument);
             collection.updateOne(document, updateKey);
         } else {
-            int Integer = 0;
             Document Updatedocument;
-            if(value.getClass().isInstance(Integer)){
+            if(value.getClass().getSimpleName().equalsIgnoreCase("Integer")){
                 Updatedocument = new Document(key, ((int)document.get(key) + (int) value));
             }else{
                 Updatedocument = new Document(key, (document.get(key) + (String) value));
@@ -72,11 +100,11 @@ public class Database extends ListenerAdapter {
     @Override
     public void onReady(ReadyEvent e) {
         //it will update collection everytime bot starts up
-        String uri = System.getenv("uri"); //Mongo DB uri
+        String uri = token.getUri(); //Mongo DB uri
         MongoClientURI clientURI = new MongoClientURI(uri);
         MongoClient client = new MongoClient(clientURI);
-        MongoDatabase database = client.getDatabase("2080"); //getting database and collection
-        collection = database.getCollection("2080");
+        MongoDatabase database = client.getDatabase("20-80"); //getting database and collection
+        collection = database.getCollection("20-80");
 
     }
 

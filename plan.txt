@@ -82,3 +82,19 @@ step one, find the reason.
             Average amount of messages
 
 
+
+    things to complete: (4:37 pm, 7/15/2022)
+    make a thread that will create a image with xchart and will upload it when calculate cmd is used
+    make a thread that can clear every data
+    make a way that will send summary every end of the week and will clear datas
+    make a way to set role to mention and summary channel
+
+    bugs to fix tmorrow:
+    fix sync uses on calculate with response
+    add some more details
+
+    find out how countdown latch sync was working on the last one. (done)
+
+    fix issue where database isn't being updated.
+    fix issue with displaying date
+    fix issue with sending summaries

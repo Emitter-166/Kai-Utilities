@@ -15,8 +15,8 @@ public class ad extends ListenerAdapter {
         if(count%20 == 0){
             EmbedBuilder ad = new EmbedBuilder()
                     .setTitle("smile reminder!")
-                    .addField("Did you know", "that you can use `.r work` and `.r wish` to remind you to use wish and work? \n" +
-                            "*this feature is exclusively for people with kai bear silver and higher. more on* <#987230669589590076>", false)
+                    .addField("Did you know", "that you can use `.r wish` and `.r work` to remind you to use wish and work? \n" +
+                            "*this feature is exclusively for people with* **Kaibear** *silver and higher. more on* <#987230669589590076>", false)
                     .setColor(Color.WHITE);
             e.getChannel().sendMessageEmbeds(ad.build()).queue();
         }

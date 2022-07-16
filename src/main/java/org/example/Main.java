@@ -21,7 +21,7 @@ public class Main {
     public static JDA jda;
 
     public static void main(String[] args) throws LoginException {
-        jda = JDABuilder.createLight(System.getenv("token")) //token will go here
+        jda = JDABuilder.createLight(token.getToken()) //token will go here
                 .enableIntents(GatewayIntent.GUILD_MEMBERS) //enabling intents
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .addEventListeners(new counter())
@@ -37,6 +37,8 @@ public class Main {
                 .addEventListeners(new reminder())
                 .addEventListeners(new froggyIsGay())
                 .addEventListeners(new org.example.twenty_eighty.Database())
+                .addEventListeners(new org.example.twenty_eighty.counter())
+                .addEventListeners(new org.example.twenty_eighty.response())
                 .build();
     }
 }
