@@ -11,16 +11,20 @@ import java.io.File;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static org.example.twenty_eighty.Database.get;
 
 
 public class response extends ListenerAdapter {
 
     public void onMessageReceived(MessageReceivedEvent e){
         String time = ZonedDateTime.now(ZoneId.of("America/New_York"))
-                .format(DateTimeFormatter.BASIC_ISO_DATE);
+                .format(DateTimeFormatter.ISO_DATE);
         Document db = null;
         try {
             db = Database.get(e.getGuild().getId(), "serverId");
@@ -40,14 +44,27 @@ public class response extends ListenerAdapter {
 
                     File file = new File("output.png");
 
-
+                    //getting total amount of messages
+                    AtomicInteger sum = new AtomicInteger();
+                    try {
+                        Arrays.stream(Database.get(e.getGuild().getId(), "serverId").get("users").toString().split(" ")).forEach(userId ->{
+                            try {
+                                if(Database.get(userId, "userId") != null)
+                                    sum.set(sum.get() + (Integer)get(userId, "userId").get("total"));
+                            } catch (InterruptedException exception) {
+                                throw new RuntimeException(exception);
+                            }
+                        });
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
 
                 e.getGuild().getTextChannelById((String) db.get("actionChannel"))
                                     .sendMessageEmbeds(new EmbedBuilder()
                                             .setTitle("Summary of the week: ")
                                             .setColor(Color.WHITE)
                                             .setDescription(String.format("**Date:** %s", time) + " \n" +
-                                                    String.format("**Total messages:** %s",db.get("messages")) + " \n" +
+                                                    String.format("**Total messages:** %s", sum) + " \n" +
                                                     String.format("**Total users:** %s", db.get("users").toString().split(" ").length)).build())
                         .content(String.format("<@&%s>", db.get("roleToMention"))).queue();
 
@@ -89,11 +106,27 @@ public class response extends ListenerAdapter {
                         throw new RuntimeException(ex);
                     }
                     File file = new File("output.png");
+
+                    //getting total message count
+                    AtomicInteger sum = new AtomicInteger();
+                    try {
+                        Arrays.stream(Database.get(e.getGuild().getId(), "serverId").get("users").toString().split(" ")).forEach(userId ->{
+                            try {
+                                if(Database.get(userId, "userId") != null)
+                                    sum.set(sum.get() + (Integer)get(userId, "userId").get("total"));
+                            } catch (InterruptedException exception) {
+                                throw new RuntimeException(exception);
+                            }
+                        });
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
+
                     e.getChannel().sendMessageEmbeds(new EmbedBuilder()
                             .setTitle("Summary")
                             .setColor(Color.WHITE)
                             .setDescription(String.format("**Date:** %s", time) + " \n" +
-                                    String.format("**Total messages:** %s",db.get("messages")) + " \n" +
+                                    String.format("**Total messages:** %s",sum.get()) + " \n" +
                                     String.format("**Total users:** %s", db.get("users").toString().split(" ").length)).build()).queue();
                     e.getMessage().reply(file).queue();
                     break;

@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static org.example.twenty_eighty.Database.*;
@@ -46,7 +47,16 @@ public class calculate implements Runnable{
         int totalMessages = 0;
         int totalUsers = 0;
         try {
-            totalMessages = (int) Database.get(serverId, "serverId").get("messages");
+            AtomicInteger sum = new AtomicInteger();
+            Arrays.stream(Database.get(serverId, "serverId").get("users").toString().split(" ")).forEach(userId ->{
+                try {
+                    if(Database.get(userId, "userId") != null)
+                        sum.set(sum.get() + (Integer)get(userId, "userId").get("total"));
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            totalMessages = sum.get();
             totalUsers =  get(serverId, "serverId").get("users").toString().split(" ").length -1;
 
         } catch (InterruptedException e) {
