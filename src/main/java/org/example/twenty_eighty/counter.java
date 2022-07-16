@@ -26,7 +26,6 @@ public class counter extends ListenerAdapter {
                 if(Arrays.stream(Database.get(guildId, "serverId").get("users").toString().split(" ")).noneMatch(userId::equalsIgnoreCase)){
                     Database.set(guildId, "serverId", "users", " " + userId, true);
                 }
-                Database.set(guildId, "serverId", "messages", 1, true);
                 Database.set(userId, "userId", "total", 1, true);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);

@@ -76,7 +76,7 @@ public class calculate implements Runnable{
                 double i_percent_messages = ((float) i / 100) * totalMessages;
                 System.out.printf("%s percent of %s messages is %s", i, totalMessages, i_percent_messages);
                 System.out.println("List of messages by user: " + tempListOfMessagesByUsers);
-                while (temp_total <= i_percent_messages) {
+                while (temp_total < i_percent_messages) {
                     user_count++;
                     if (tempListOfMessagesByUsers.size() != 0) {
                         temp_total += (Integer) tempListOfMessagesByUsers.get(tempListOfMessagesByUsers.size() - 1);
