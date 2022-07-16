@@ -43,10 +43,7 @@ public class Database extends ListenerAdapter {
     private static void createDB(String Id) {
         //server config, here is the template used to make new settings document on db collection
         Document document = new Document("serverId", Id)
-                .append("users", "")
-                .append("roleToMention", "")
-                .append("actionChannel", "")
-                .append("isSummarySend", false);
+                .append("users", "");
 
         collection.insertOne(document);
 
