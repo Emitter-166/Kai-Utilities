@@ -16,7 +16,7 @@ public class reminder extends ListenerAdapter {
             if (!e.getMember().getRoles().stream().anyMatch(role -> role.getId().equalsIgnoreCase("979641351933141053"))) {
                 e.getMessage().replyEmbeds(new EmbedBuilder()
                                 .setTitle("You can't do that!")
-                                .setDescription("*you must have* **kai bear silver** *or higher in order to do that! \n" +
+                                .setDescription("*you must have* **Kaibear Silver** *or higher in order to do that! \n" +
                                         "more infos on:* <#987230669589590076>")
                                 .setColor(Color.BLACK).build())
                         .mentionRepliedUser(false)
