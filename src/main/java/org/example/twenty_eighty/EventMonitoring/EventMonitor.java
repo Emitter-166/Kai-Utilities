@@ -37,7 +37,6 @@ public class EventMonitor extends ListenerAdapter {
 
                 case "start":
                     try {
-                        System.out.println(Database.get(serverId, "serverId").get("eventMonitoringChannels"));
                         if(!(Database.get(serverId, "serverId").get("eventMonitoringChannels").toString().contains(e.getChannel().getId()))
                                 || (Database.get(serverId, "serverId").get("eventMonitoringChannels").toString() == null)) {
                             e.getMessage().reply("`Event will be monitored here! Have fun everyone!` :grin:")
@@ -119,7 +118,6 @@ public class EventMonitor extends ListenerAdapter {
                         Database.collection.deleteOne(Filters.eq("eventChannelId", args[2].replace("<", "")
                                 .replace("#", "")
                                 .replace(">", "") ));
-                        System.out.println("deleted");
                         Database.set(serverId, "serverId", "eventMonitoringChannels", Database.get(serverId,
                                 "serverId").get("eventMonitoringChannels").toString().replace(
                                       " " + args[2].replace("<", "")
@@ -138,7 +136,6 @@ public class EventMonitor extends ListenerAdapter {
                     } catch (InterruptedException ex) {
                         throw new RuntimeException(ex);
                     }
-                    System.out.println(array_of_event_channels.length);
                     if(array_of_event_channels.length == 1){
                         e.getMessage().reply("`No events running atm`")
                                 .mentionRepliedUser(false)

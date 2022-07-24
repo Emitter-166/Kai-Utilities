@@ -1,12 +1,9 @@
 package org.example.twenty_eighty.EventMonitoring;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.bson.Document;
 import org.example.Main;
 import org.example.twenty_eighty.Database;
-
 import java.awt.*;
-import java.util.NoSuchElementException;
 
 public class statsThread implements Runnable{
 

@@ -90,7 +90,6 @@ public class Database extends ListenerAdapter {
             //it will try to assign value to document, if there is no server settings for role logging, it will create one
             document = collection.find(new Document(field, Id)).cursor().next();
         } catch (NoSuchElementException exception) {
-            System.out.println("No elements");
             if(field.equalsIgnoreCase("serverId")){
                 createDB(Id);
             }else if(field.equalsIgnoreCase("userId")){
