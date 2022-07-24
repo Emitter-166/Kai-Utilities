@@ -43,16 +43,9 @@ public class response extends ListenerAdapter {
                     break;
 
                 case "calculate":
-                    calculate calculate = new calculate(e.getGuild().getId());
+                    calculate calculate = new calculate(e.getGuild().getId(), e.getChannel().getId());
                     Thread thread = new Thread(calculate);
                     thread.start();
-                    try {
-                        thread.join();
-                    } catch (InterruptedException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                    File file = new File("output.png");
-
                     //getting total message count
                     AtomicInteger sum = new AtomicInteger();
                     try {
@@ -74,7 +67,6 @@ public class response extends ListenerAdapter {
                             .setDescription(String.format("**Date:** %s", time) + " \n" +
                                     String.format("**Total messages:** %s",sum.get()) + " \n" +
                                     String.format("**Total users:** %s", db.get("users").toString().split(" ").length)).build()).queue();
-                    e.getMessage().reply(file).queue();
                     break;
 
                 case "reset":
@@ -84,29 +76,6 @@ public class response extends ListenerAdapter {
                    Thread cleanerThread = new Thread(new clear(e.getGuild().getId()));
                    cleanerThread.start();
                    break;
-
-                case "roleToMention":
-                    e.getMessage().reply("`ping role for summary set!`")
-                            .mentionRepliedUser(false)
-                            .queue();
-                    System.out.println(args[2]);
-                   String role = args[2].replace("<", "").replace("@", "").replace(">", "").replace("&", "");
-                    try {
-                        Database.set(e.getGuild().getId(), "serverId", "actionChannel", role, false);
-                    } catch (InterruptedException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                    break;
-
-                case "summaryChannel":
-                    e.getMessage().reply("`summary channel set!`")
-                            .mentionRepliedUser(false)
-                            .queue();
-                    try {
-                        Database.set(e.getGuild().getId(), "serverId", "actionChannel", e.getChannel().getId(), false);
-                    } catch (InterruptedException ex) {
-                        throw new RuntimeException(ex);
-                    }
             }
         }
     }

@@ -99,3 +99,13 @@ step one, find the reason.
     fix issue with displaying date
     fix issue with sending summaries
     make it so that there will be no totalMessages and it will be taken directly from the users
+
+  event monitor stats will show:
+
+  amount of users
+  total messages
+  average messages by users
+  duration of that event
+  average messages per minutes
+
+

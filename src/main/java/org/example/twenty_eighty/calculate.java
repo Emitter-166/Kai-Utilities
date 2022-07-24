@@ -1,10 +1,12 @@
 package org.example.twenty_eighty;
 
 
+import org.example.Main;
 import org.knowm.xchart.BitmapEncoder;
 import org.knowm.xchart.QuickChart;
 import org.knowm.xchart.XYChart;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,8 +22,11 @@ public class calculate implements Runnable{
     List<Float> result = new ArrayList<>();
     List<Integer> percentages  = new ArrayList<>(Arrays.asList( 0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100));
 
-    public calculate(String serverId) {
+    String channel_to_send = "";
+
+    public calculate(String serverId, String channel_to_send) {
         this.serverId = serverId;
+        this.channel_to_send = channel_to_send;
     }
 
     String serverId;
@@ -99,6 +104,8 @@ public class calculate implements Runnable{
             throw new RuntimeException(e);
         }
         System.out.println("End of Calculate");
+        File file = new File("output.png");
+        Main.jda.getTextChannelById(channel_to_send).sendFile(file).queue();
     }
 }
 

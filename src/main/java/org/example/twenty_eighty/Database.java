@@ -43,7 +43,8 @@ public class Database extends ListenerAdapter {
     private static void createDB(String Id) {
         //server config, here is the template used to make new settings document on db collection
         Document document = new Document("serverId", Id)
-                .append("users", "");
+                .append("users", "")
+                .append("eventMonitoringChannels", "");
 
         collection.insertOne(document);
 
@@ -56,6 +57,23 @@ public class Database extends ListenerAdapter {
 
     }
 
+    private static void createChannelDB(String Id) {
+        //user config, here is the template used to make new settings document on db collection
+        Document document = new Document("channelId", Id)
+                .append("tempTotal", 0)
+                .append("tempUserCount", 0);
+        collection.insertOne(document);
+
+    }
+    private static void createChannelEventDB(String Id) {
+        //user config, here is the template used to make new settings document on db collection
+        Document document = new Document("eventChannelId", Id)
+                .append("amountOfUsers", 0)
+                .append("totalMessages", 0)
+                .append("timeStarted", 0);
+        collection.insertOne(document);
+
+    }
 
     private static void updateDB(String Id, String field, String key, Object value, boolean isAdd) throws InterruptedException {
         //for server
@@ -66,8 +84,12 @@ public class Database extends ListenerAdapter {
         } catch (NoSuchElementException exception) {
             if(field.equalsIgnoreCase("serverId")){
                 createDB(Id);
-            }else{
+            }else if(field.equalsIgnoreCase("userId")){
                 createUserDB(Id);
+            }else if(field.equalsIgnoreCase("channelId")){
+                createChannelDB(Id);
+            }else if(field.equalsIgnoreCase("eventChannelId")){
+                createChannelEventDB(Id);
             }
 
             Thread.sleep(200);

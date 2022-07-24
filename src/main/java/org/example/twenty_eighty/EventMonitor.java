@@ -3,6 +3,7 @@ package org.example.twenty_eighty;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.user.UserTypingEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.awt.*;
@@ -36,7 +37,8 @@ public class EventMonitor extends ListenerAdapter {
                             .setColor(Color.BLACK)
                             .setDescription("`.eventMonitor start` **use this command in the channel you want the bot to look for** \n" +
                                     "`.eventMonitor stats` **use this to see current stats for that channel** \n" +
-                                    "`.eventMonitor end` **end monitoring**").build())
+                                    "`.eventMonitor end` **end monitoring** \n" +
+                                    "`.eventMonitor events` **see all the events that are being monitored").build())
                              .mentionRepliedUser(false)
                              .queue();
                      break;
@@ -80,12 +82,11 @@ public class EventMonitor extends ListenerAdapter {
                             .queue();
                     isRunning = false;
                     channelId_to_monitor = "";
+                    messageCount = 0;
+                    userIds.clear();
+                    break;
 
             }
         }
-
-
-
-
     }
 }
