@@ -1,5 +1,6 @@
 package org.example.Leaderboard;
 
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -38,6 +39,7 @@ class upDater implements Runnable{
 }
 public class counter extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent e) {
+        if(e.getChannel().getType().equals(ChannelType.PRIVATE)) return;
         if(Database.cleanerRunning) {
             System.out.println("Cleaner running, can't perform this operation, code: " + e.getMember().getEffectiveName());
             databaseOperationRunning.countDown();

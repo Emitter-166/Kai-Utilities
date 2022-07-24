@@ -1,5 +1,6 @@
 package org.example.twenty_eighty;
 
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -35,6 +36,7 @@ public class counter extends ListenerAdapter {
 
 
     public void onMessageReceived(MessageReceivedEvent e){
+        if(e.getChannel().getType().equals(ChannelType.PRIVATE)) return;
         if(clearRunning){
             System.out.println("cleaner running, can't execute this. user: " + e.getAuthor().getName());
             return;

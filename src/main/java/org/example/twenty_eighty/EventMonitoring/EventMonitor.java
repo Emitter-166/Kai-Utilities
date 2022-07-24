@@ -1,13 +1,16 @@
-package org.example.twenty_eighty;
+package org.example.twenty_eighty.EventMonitoring;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.user.UserTypingEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.example.twenty_eighty.Database;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class EventMonitor extends ListenerAdapter {
@@ -25,6 +28,7 @@ public class EventMonitor extends ListenerAdapter {
                 userIds.add(e.getAuthor().getId());
             }
         }
+        if(e.getChannel().getType().equals(ChannelType.PRIVATE)) return;
         if(!e.getMember().hasPermission(Permission.MODERATE_MEMBERS)) return;
 
         String[] args = e.getMessage().getContentRaw().split(" ");
@@ -44,16 +48,29 @@ public class EventMonitor extends ListenerAdapter {
                      break;
 
                 case "start":
-                    if(isRunning){
-                        e.getMessage().replyFormat("**you can't do that!** an event is already being monitored on <#%s>", channelId_to_monitor)
-                                .mentionRepliedUser(false)
-                                .queue();
-                    }else{
-                        e.getMessage().reply("`Event will be monitored in this channel!, make sure to end the monitoring after event ends :)`")
-                                .mentionRepliedUser(false)
-                                .queue();
-                        isRunning = true;
-                        channelId_to_monitor = e.getChannel().getId();
+                    try {
+                        System.out.println(Database.get(e.getGuild().getId(), "serverId").get("eventMonitoringChannels"));
+                        if(!(Database.get(e.getGuild().getId(), "serverId").get("eventMonitoringChannels").toString().contains(e.getChannel().getId()))
+                                || (Database.get(e.getGuild().getId(), "serverId").get("eventMonitoringChannels").toString() == null)) {
+                            e.getMessage().reply("`Event will be monitored here! Have fun everyone!` :grin:")
+                                    .mentionRepliedUser(false)
+                                    .queue();
+                            e.getAuthor().openPrivateChannel().flatMap(channel -> channel.sendMessageFormat("`Started Monitoring event on` <#%s> `Do .eventMonitor help for more info`", e.getChannel().getId())).queue();
+
+                            Database.set(e.getGuild().getId(), "serverId", "eventMonitoringChannels", " " + e.getChannel().getId(), true);
+                            Database.set(e.getChannel().getId(), "eventChannelId", "timeStarted", System.currentTimeMillis(), false);
+                            Database.set(e.getChannel().getId(), "eventChannelId", "HostId", e.getAuthor().getId(), false);
+                        }else{
+                            e.getMessage().reply("`An event is already being monitored here` :grin:")
+                                    .mentionRepliedUser(false)
+                                    .queue();
+                        }
+                    } catch (Exception ex) {
+                        e.getAuthor().openPrivateChannel().flatMap(channel -> channel.sendMessageEmbeds(new EmbedBuilder()
+                                .setTitle("An error occurred!")
+                                .setDescription("Occurred at: ```" + ex.getStackTrace()[0] + "``` \n" +
+                                        "**Please try again or contact the developer**").build())).queue();
+                        ex.printStackTrace();
                     }
                     break;
 

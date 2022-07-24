@@ -2,6 +2,7 @@ package org.example.twenty_eighty;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.bson.Document;
@@ -20,6 +21,7 @@ import static org.example.twenty_eighty.Database.get;
 public class response extends ListenerAdapter {
 
     public void onMessageReceived(MessageReceivedEvent e){
+        if(e.getChannel().getType().equals(ChannelType.PRIVATE)) return;
         String time = ZonedDateTime.now(ZoneId.of("America/New_York"))
                 .format(DateTimeFormatter.ISO_DATE);
         Document db = null;

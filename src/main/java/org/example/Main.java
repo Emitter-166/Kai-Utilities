@@ -14,7 +14,8 @@ import org.example.roleLogging.setup;
 import org.example.smileReminder.ad;
 import org.example.smileReminder.froggyIsGay;
 import org.example.smileReminder.reminder;
-import org.example.twenty_eighty.EventMonitor;
+import org.example.twenty_eighty.EventMonitoring.EventMonitor;
+import org.example.twenty_eighty.EventMonitoring.EventMonitorCounter;
 
 import javax.security.auth.login.LoginException;
 
@@ -41,6 +42,7 @@ public class Main {
                 .addEventListeners(new org.example.twenty_eighty.counter())
                 .addEventListeners(new org.example.twenty_eighty.response())
                 .addEventListeners(new EventMonitor())
+                .addEventListeners(new EventMonitorCounter())
                 .build();
     }
 }
