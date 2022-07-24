@@ -31,13 +31,20 @@ public class Database extends ListenerAdapter {
        }catch (NoSuchElementException exception){
            if(field.equalsIgnoreCase("serverId")){
                createDB(Id);
-           }else{
+           }else if(field.equalsIgnoreCase("userId")){
                createUserDB(Id);
+           }else if(field.equalsIgnoreCase("channelId")){
+               createChannelDB(Id);
+           }else if(field.equalsIgnoreCase("eventChannelId")){
+               createChannelEventDB(Id);
            }
            Thread.sleep(200);
            return collection.find(new Document(field, Id)).cursor().next();
        }
 
+    }
+    public static Document normalGet(String Id, String field){
+        return collection.find(new Document(field, Id)).cursor().next();
     }
 
     private static void createDB(String Id) {
@@ -71,7 +78,7 @@ public class Database extends ListenerAdapter {
                 .append("Users", "")
                 .append("HostId", "")
                 .append("totalMessages", 0)
-                .append("timeStarted", 0);
+                .append("timeStarted", 0L);
         collection.insertOne(document);
 
     }
