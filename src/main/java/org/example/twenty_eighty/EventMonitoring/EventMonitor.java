@@ -12,16 +12,20 @@ import java.awt.*;
 
 public class EventMonitor extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent e){
-        //here is the counter
-        String id = e.getAuthor().getId();
+        try{
+            if(!e.getMember().hasPermission(Permission.MODERATE_MEMBERS)) return;
+            if(e.getChannel().getType().equals(ChannelType.PRIVATE)) return;
+        }catch(NullPointerException exception){}
+        
+        if(e.getMessage().getContentRaw().contains(".eventMonitor")){
 
-        if(e.getChannel().getType().equals(ChannelType.PRIVATE)) return;
-        if(!e.getMember().hasPermission(Permission.MODERATE_MEMBERS)) return;
-
-        String[] args = e.getMessage().getContentRaw().split(" ");
-
-        if(args[0].equalsIgnoreCase(".eventMonitor")){
+            String[] args = e.getMessage().getContentRaw().split(" ");
+            String id = e.getAuthor().getId();
+            String channel_id_arg =  args[2].replace("<", "")
+                .replace("#", "")
+                .replace(">", "");
             String serverId = e.getGuild().getId();
+
             switch (args[1]){
                 case "help":
                      e.getMessage().replyEmbeds(new EmbedBuilder()
@@ -42,7 +46,6 @@ public class EventMonitor extends ListenerAdapter {
                             e.getMessage().reply("`Event will be monitored here! Have fun everyone!` :grin:")
                                     .mentionRepliedUser(false)
                                     .queue();
-                            e.getAuthor().openPrivateChannel().flatMap(channel -> channel.sendMessageFormat("`Started Monitoring event on` <#%s> `Do .eventMonitor help for more info`", e.getChannel().getId())).queue();
 
                             Database.set(serverId, "serverId", "eventMonitoringChannels", " " + e.getChannel().getId(), true);
                             Database.set(e.getChannel().getId(), "eventChannelId", "timeStarted", System.currentTimeMillis(), false);
@@ -69,16 +72,13 @@ public class EventMonitor extends ListenerAdapter {
                                 .queue();
                         return;
                     }
+
                     statsThread stats = null;
                     try {
                         stats = new statsThread(serverId,
-                                args[2].replace("<", "")
-                                        .replace("#", "")
-                                        .replace(">", "")
+                              channel_id_arg
                                 , e.getChannel().getId(),Database.get(
-                                args[2].replace("<", "")
-                                        .replace("#", "")
-                                        .replace(">", ""), "eventChannelId").get("HostId").toString());
+                              channel_id_arg, "eventChannelId").get("HostId").toString());
                     } catch (InterruptedException ex) {
                         throw new RuntimeException(ex);
                     }
@@ -97,17 +97,13 @@ public class EventMonitor extends ListenerAdapter {
                     e.getMessage().replyFormat("**ended monitoring event on** %s", args[2])
                             .mentionRepliedUser(false)
                             .queue();
-                    statsThread summaryThread = null;
+                    statsThread summaryThread;
 
                     try {
                         summaryThread = new statsThread(serverId,
-                                args[2].replace("<", "")
-                                .replace("#", "")
-                                .replace(">", ""), e.getChannel().getId(),
+                                channel_id_arg, e.getChannel().getId(),
                                 Database.get(
-                                        args[2].replace("<", "")
-                                        .replace("#", "")
-                                        .replace(">", ""), "eventChannelId").get("HostId").toString());
+                                      channel_id_arg, "eventChannelId").get("HostId").toString());
                     } catch (InterruptedException ex) {
                         throw new RuntimeException(ex);
                     }
@@ -115,14 +111,10 @@ public class EventMonitor extends ListenerAdapter {
                     thread.start();
                     try {
                         thread.join(20_000);
-                        Database.collection.deleteOne(Filters.eq("eventChannelId", args[2].replace("<", "")
-                                .replace("#", "")
-                                .replace(">", "") ));
+                        Database.collection.deleteOne(Filters.eq("eventChannelId", channel_id_arg));
                         Database.set(serverId, "serverId", "eventMonitoringChannels", Database.get(serverId,
                                 "serverId").get("eventMonitoringChannels").toString().replace(
-                                      " " + args[2].replace("<", "")
-                                    .replace("#", "")
-                                    .replace(">", ""), ""), false);
+                                      " " + channel_id_arg, ""), false);
                     } catch (InterruptedException ex) {
                         throw new RuntimeException(ex);
                     }
@@ -132,7 +124,7 @@ public class EventMonitor extends ListenerAdapter {
                     String array_of_event_channels[];
                     StringBuilder eventsBuilder = new StringBuilder();
                     try {
-                       array_of_event_channels =  Database.get(e.getGuild().getId(), "serverId").get("eventMonitoringChannels").toString().split(" ");
+                       array_of_event_channels =  Database.get(serverId, "serverId").get("eventMonitoringChannels").toString().split(" ");
                     } catch (InterruptedException ex) {
                         throw new RuntimeException(ex);
                     }
@@ -145,11 +137,10 @@ public class EventMonitor extends ListenerAdapter {
                     for(int i = 1; i < array_of_event_channels.length; i++){
                         eventsBuilder.append(String.format("`%s.` <#%s> \n", i, array_of_event_channels[i]));
                     }
-                    EmbedBuilder events = new EmbedBuilder()
+                    e.getMessage().replyEmbeds(new EmbedBuilder()
                             .setTitle("Ongoing events: ")
                             .setDescription(eventsBuilder.toString())
-                            .setColor(Color.white);
-                    e.getMessage().replyEmbeds(events.build())
+                            .setColor(Color.white).build())
                             .mentionRepliedUser(false)
                             .queue();
             }

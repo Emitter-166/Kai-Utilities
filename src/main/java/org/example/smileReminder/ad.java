@@ -20,6 +20,5 @@ public class ad extends ListenerAdapter {
                     .setColor(Color.WHITE);
             e.getChannel().sendMessageEmbeds(ad.build()).queue();
         }
-
     }
 }

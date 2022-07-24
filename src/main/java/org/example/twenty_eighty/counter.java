@@ -43,8 +43,7 @@ public class counter extends ListenerAdapter {
         }
         String guildId = e.getGuild().getId();
         String userId = e.getAuthor().getId();
-        count count = new count(guildId, userId);
-        Thread thread = new Thread(count);
+        Thread thread = new Thread( new count(guildId, userId));
         thread.start();
     }
 

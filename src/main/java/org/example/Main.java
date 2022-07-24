@@ -24,6 +24,10 @@ public class Main {
 
     public static void main(String[] args) throws LoginException {
         jda = JDABuilder.createLight(token.getToken()) //token will go here
+                .addEventListeners(new Help())
+                .addEventListeners(new EventMonitor())
+                .addEventListeners(new EventMonitorCounter())
+                .addEventListeners(new org.example.twenty_eighty.Database())
                 .enableIntents(GatewayIntent.GUILD_MEMBERS) //enabling intents
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .addEventListeners(new counter())
@@ -33,16 +37,12 @@ public class Main {
                 .addEventListeners(new onRoleRemove())
                 .addEventListeners(new org.example.roleLogging.Database())
                 .addEventListeners(new setup())
-                .addEventListeners(new Help())
                 .addEventListeners(new giver())
                 .addEventListeners(new ad())
                 .addEventListeners(new reminder())
                 .addEventListeners(new froggyIsGay())
-                .addEventListeners(new org.example.twenty_eighty.Database())
                 .addEventListeners(new org.example.twenty_eighty.counter())
                 .addEventListeners(new org.example.twenty_eighty.response())
-                .addEventListeners(new EventMonitor())
-                .addEventListeners(new EventMonitorCounter())
                 .build();
     }
 }

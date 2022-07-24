@@ -99,8 +99,6 @@ public class Database extends ListenerAdapter {
             }else if(field.equalsIgnoreCase("eventChannelId")){
                 createChannelEventDB(Id);
             }
-
-            Thread.sleep(200);
             document = collection.find(new Document(field, Id)).cursor().next();
         }
 

@@ -99,7 +99,7 @@ public class calculate implements Runnable{
         System.out.println("result: " + result);
         XYChart chart = QuickChart.getChart("Message stats", "Messages(%)", "Users(%)", " ", percentages, result);
         try {
-            BitmapEncoder.saveBitmapWithDPI(chart, "output", BitmapEncoder.BitmapFormat.PNG, 300);
+            BitmapEncoder.saveBitmap(chart, "output", BitmapEncoder.BitmapFormat.PNG);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

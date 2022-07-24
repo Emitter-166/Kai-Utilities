@@ -20,26 +20,21 @@ public class statsThread implements Runnable{
 
 
    void sendSummary(int amount_of_users, int total_messages, int duration_of_event_in_minutes){
-       String duration = duration_of_event_in_minutes + " minutes";
+
 
        amount_of_users -= 1;
        EmbedBuilder summary = new EmbedBuilder()
                 .setTitle("Event stats")
-                .setDescription(String.format("**Channel:** <#%s> \n", eventChannelId))
-                .appendDescription(String.format("**Host:** <@%s> \n", requested_user_Id))
-                .appendDescription(String.format("**Event duration:** `%s` \n", duration))
-                .appendDescription(String.format("**Total user participated:** `%s` \n", amount_of_users))
-                .appendDescription(String.format("**Total messages from event:** `%s` \n", total_messages))
-                .appendDescription(String.format("**Average messages per user:** `%.2f` \n", (float)total_messages/amount_of_users))
-               .appendDescription(String.format("**Average messages per minute:** `%.2f` \n", (float) total_messages/duration_of_event_in_minutes))
+                .setDescription(String.format("**Channel:** <#%s> \n", eventChannelId) +
+               (String.format("**Host:** <@%s> \n", requested_user_Id)) +
+               (String.format("**Event duration:** `%s` \n", duration_of_event_in_minutes + " minutes")) +
+                (String.format("**Total user participated:** `%s` \n", amount_of_users)) +
+                (String.format("**Total messages from event:** `%s` \n", total_messages)) +
+                (String.format("**Average messages per user:** `%.2f` \n", (float)total_messages/amount_of_users)) +
+               (String.format("**Average messages per minute:** `%.2f` \n", (float) total_messages/duration_of_event_in_minutes)))
                .setColor(Color.WHITE);
 
        Main.jda.getTextChannelById(channel_to_send).sendMessageEmbeds(summary.build()).queue();
-       try{
-           Main.jda.openPrivateChannelById(requested_user_Id).flatMap(channel -> channel.sendMessageEmbeds(summary.build())).queue();
-       }catch (Exception exception){}
-
-
     }
 
     @Override

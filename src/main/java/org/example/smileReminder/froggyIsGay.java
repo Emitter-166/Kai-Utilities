@@ -9,11 +9,10 @@ import java.awt.*;
 public class froggyIsGay extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent e){
         if(e.getMessage().getContentRaw().equalsIgnoreCase(".froggy")){
-            EmbedBuilder froggyBuilder = new EmbedBuilder()
-                    .setColor(Color.BLACK)
-                    .setTitle("Froggy is Gay!!!")
-                    .setImage("https://cdn.discordapp.com/attachments/986979518759718944/986983733649371256/unknown.png");
-            e.getMessage().replyEmbeds(froggyBuilder.build())
+            e.getMessage().replyEmbeds(new EmbedBuilder()
+                            .setColor(Color.BLACK)
+                            .setTitle("Froggy is Gay!!!")
+                            .setImage("https://cdn.discordapp.com/attachments/986979518759718944/986983733649371256/unknown.png").build())
                     .mentionRepliedUser(false)
                     .queue();
         }

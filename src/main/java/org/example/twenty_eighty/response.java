@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.bson.Document;
 
 import java.awt.*;
-import java.io.File;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -30,7 +29,9 @@ public class response extends ListenerAdapter {
         } catch (InterruptedException ex) {
             throw new RuntimeException(ex);
         }
-        if(!e.getMember().hasPermission(Permission.MODERATE_MEMBERS)) return;
+       try{
+           if(!e.getMember().hasPermission(Permission.MODERATE_MEMBERS)) return;
+       }catch (NullPointerException exception){}
         String[] args = e.getMessage().getContentRaw().split(" ");
         if(args[0].equalsIgnoreCase(".stats")){
             switch (args[1]){
