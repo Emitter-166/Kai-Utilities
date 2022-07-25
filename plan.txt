@@ -107,5 +107,8 @@ step one, find the reason.
   average messages by users
   duration of that event
   average messages per minutes
+ (done)
 
+ I think slow bot is database problem. I havent implemented it properly
+ also I have to use more slash commands
 

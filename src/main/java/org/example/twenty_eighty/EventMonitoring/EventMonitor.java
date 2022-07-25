@@ -21,9 +21,12 @@ public class EventMonitor extends ListenerAdapter {
 
             String[] args = e.getMessage().getContentRaw().split(" ");
             String id = e.getAuthor().getId();
-            String channel_id_arg =  args[2].replace("<", "")
-                .replace("#", "")
-                .replace(">", "");
+            String channel_id_arg = null;
+            if(args.length > 2){
+                channel_id_arg =  args[2].replace("<", "")
+                        .replace("#", "")
+                        .replace(">", "");
+            }
             String serverId = e.getGuild().getId();
 
             switch (args[1]){

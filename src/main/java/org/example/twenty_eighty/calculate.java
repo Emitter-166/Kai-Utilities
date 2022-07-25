@@ -11,10 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-
-import static org.example.twenty_eighty.Database.*;
 
 
 public class calculate implements Runnable{
@@ -35,63 +32,55 @@ public class calculate implements Runnable{
 
     @Override
     public void run() {
+        long past = System.currentTimeMillis();
         System.out.println("calculate running");
+        String[] arrayOfUsers;
         try {
-            Arrays.stream(Database.get(serverId, "serverId").get("users").toString().split(" ")).forEach(user -> {
-
-                try {
-                    if(Database.get(user, "userId") != null)
-                        messages_by_users.add((Integer) Database.get(user, "userId").get("total"));
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            arrayOfUsers = Database.get(serverId, "serverId").get("users").toString().split(" ");
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+
         int totalMessages = 0;
-        int totalUsers = 0;
-        try {
-            AtomicInteger sum = new AtomicInteger();
-            Arrays.stream(Database.get(serverId, "serverId").get("users").toString().split(" ")).forEach(userId ->{
-                try {
-                    if(Database.get(userId, "userId") != null)
-                        sum.set(sum.get() + (Integer)get(userId, "userId").get("total"));
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-            totalMessages = sum.get();
-            totalUsers =  get(serverId, "serverId").get("users").toString().split(" ").length -1;
+        int arrLength = arrayOfUsers.length;
+           for(int i = 0; i < arrLength; i++){
+               try {
+                   if(Database.get(arrayOfUsers[i], "userId") != null){
+                       int messages_by_member = (int) Database.get(arrayOfUsers[i], "userId").get("total");
+                       messages_by_users.add(messages_by_member);
+                       totalMessages = totalMessages +messages_by_member;
+                       System.out.printf("%s. user: %s, messages: %s \n", i,arrayOfUsers[i], messages_by_member);
+                   }
+               } catch (InterruptedException e) {
+                       throw new RuntimeException(e);
+                   }
+           }
 
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
 
 
         int temp_total;
         int user_count;
+        List tempListOfMessagesByUsers = messages_by_users.stream().sorted().collect(Collectors.toList());
         for(int i = 0; i <= 100; i += 5){
             if(i != 0) {
                 temp_total = 0;
                 user_count = 0;
-                List tempListOfMessagesByUsers = messages_by_users.stream().sorted().collect(Collectors.toList());
-
                 //main algorithm
                 double i_percent_messages = ((float) i / 100) * totalMessages;
                 System.out.printf("%s percent of %s messages is %s \n", i, totalMessages, i_percent_messages);
                 System.out.println("List of messages by user: " + tempListOfMessagesByUsers);
                 while (temp_total < i_percent_messages) {
                     user_count++;
-                    if (tempListOfMessagesByUsers.size() != 0) {
-                        temp_total += (Integer) tempListOfMessagesByUsers.get(tempListOfMessagesByUsers.size() - 1);
-                        tempListOfMessagesByUsers.remove(tempListOfMessagesByUsers.size() - 1);
-                        System.out.println("temp total messages: " + temp_total + " user count: " + user_count + " percentages of users: " + ((float) user_count / totalUsers) * 100);
+                    int size = tempListOfMessagesByUsers.size();
+                    if (size != 0) {
+                        temp_total += (int) tempListOfMessagesByUsers.get(size - 1);
+                        tempListOfMessagesByUsers.remove(size - 1);
+                        System.out.println("temp total messages: " + temp_total + " user count: " + user_count + " percentages of users: " + ((float) user_count / arrLength - 1) * 100);
                     } else {
                         break;
                     }
                 }
-                result.add(((float) user_count / totalUsers) * 100);
+                result.add(((float) user_count / arrLength - 1) * 100);
             }else{
                 result.add(0.0f);
             }
@@ -105,7 +94,11 @@ public class calculate implements Runnable{
         }
         System.out.println("End of Calculate");
         File file = new File("output.png");
-        Main.jda.getTextChannelById(channel_to_send).sendFile(file).queue();
+        Main.jda.getTextChannelById(channel_to_send).sendFile(file).queue(
+                message -> {
+                    message.editMessageFormat("**Calculation time:** `%2.f` minutes", (float) (System.currentTimeMillis() - past) / 60000).queue();
+                }
+        );
     }
 }
 

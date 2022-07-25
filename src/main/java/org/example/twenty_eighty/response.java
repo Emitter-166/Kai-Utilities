@@ -50,26 +50,30 @@ public class response extends ListenerAdapter {
                     Thread thread = new Thread(calculate);
                     thread.start();
                     //getting total message count
-                    AtomicInteger sum = new AtomicInteger();
-                    try {
-                        Arrays.stream(Database.get(e.getGuild().getId(), "serverId").get("users").toString().split(" ")).forEach(userId ->{
-                            try {
-                                if(Database.get(userId, "userId") != null)
-                                    sum.set(sum.get() + (Integer)get(userId, "userId").get("total"));
-                            } catch (InterruptedException exception) {
-                                throw new RuntimeException(exception);
+                    Document finalDb = db;
+                    Runnable runnable = () -> {
+                        int sum = 0;
+                        try {
+                            String[] array_of_users = get(e.getGuild().getId(), "serverId").get("users").toString().split(" ");
+                            for(int i = 0; i < array_of_users.length; i++) {
+                                try {
+                                    if (Database.get(array_of_users[i], "userId") != null)
+                                        sum = sum + (int) get(array_of_users[i], "userId").get("total");
+                                } catch (InterruptedException exception) {
+                                    throw new RuntimeException(exception);
+                                }
                             }
-                        });
-                    } catch (InterruptedException ex) {
-                        throw new RuntimeException(ex);
-                    }
-
-                    e.getChannel().sendMessageEmbeds(new EmbedBuilder()
-                            .setTitle("Summary")
-                            .setColor(Color.WHITE)
-                            .setDescription(String.format("**Date:** %s", time) + " \n" +
-                                    String.format("**Total messages:** %s",sum.get()) + " \n" +
-                                    String.format("**Total users:** %s", db.get("users").toString().split(" ").length)).build()).queue();
+                        } catch (InterruptedException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                        e.getChannel().sendMessageEmbeds(new EmbedBuilder()
+                                .setTitle("Summary")
+                                .setColor(Color.WHITE)
+                                .setDescription(String.format("**Total messages:** %s",sum) + " \n" +
+                                        String.format("**Total users:** %s", finalDb.get("users").toString().split(" ").length)).build()).queue();
+                    };
+                    Thread thread1 = new Thread(runnable);
+                    thread1.start();
                     break;
 
                 case "reset":
