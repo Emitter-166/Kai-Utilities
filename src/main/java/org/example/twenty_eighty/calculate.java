@@ -42,6 +42,7 @@ public class calculate implements Runnable{
         }
 
         int totalMessages = 0;
+        System.out.println(arrayOfUsers.length -1 );
         int arrLength = arrayOfUsers.length;
            for(int i = 0; i < arrLength; i++){
                try {
@@ -60,8 +61,9 @@ public class calculate implements Runnable{
 
         int temp_total;
         int user_count;
-        List tempListOfMessagesByUsers = messages_by_users.stream().sorted().collect(Collectors.toList());
+
         for(int i = 0; i <= 100; i += 5){
+            List tempListOfMessagesByUsers = messages_by_users.stream().sorted().collect(Collectors.toList());
             if(i != 0) {
                 temp_total = 0;
                 user_count = 0;
@@ -75,12 +77,12 @@ public class calculate implements Runnable{
                     if (size != 0) {
                         temp_total += (int) tempListOfMessagesByUsers.get(size - 1);
                         tempListOfMessagesByUsers.remove(size - 1);
-                        System.out.println("temp total messages: " + temp_total + " user count: " + user_count + " percentages of users: " + ((float) user_count / arrLength - 1) * 100);
+                        System.out.println("temp total messages: " + temp_total + " user count: " + user_count + " percentages of users: " + ((float) user_count / (arrLength - 1)) * 100);
                     } else {
                         break;
                     }
                 }
-                result.add(((float) user_count / arrLength - 1) * 100);
+                result.add(((float) user_count / (arrLength - 1)) * 100);
             }else{
                 result.add(0.0f);
             }
@@ -96,7 +98,7 @@ public class calculate implements Runnable{
         File file = new File("output.png");
         Main.jda.getTextChannelById(channel_to_send).sendFile(file).queue(
                 message -> {
-                    message.editMessageFormat("**Calculation time:** `%2.f` minutes", (float) (System.currentTimeMillis() - past) / 60000).queue();
+                    message.editMessageFormat("**Calculation time:** `%s` minutes", (float) (System.currentTimeMillis() - past) / 60000).queue();
                 }
         );
     }

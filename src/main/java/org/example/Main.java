@@ -5,9 +5,10 @@ import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.example.Leaderboard.Database;
-import org.example.Leaderboard.counter;
 import org.example.Leaderboard.response;
+import org.example.TorD.truthAndDare;
 import org.example.bulkSmileGiver.giver;
+import org.example.captionMe.counter;
 import org.example.roleLogging.Listeners.Logging.onRoleAdd;
 import org.example.roleLogging.Listeners.Logging.onRoleRemove;
 import org.example.roleLogging.setup;
@@ -30,7 +31,7 @@ public class Main {
                 .addEventListeners(new org.example.twenty_eighty.Database())
                 .enableIntents(GatewayIntent.GUILD_MEMBERS) //enabling intents
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
-                .addEventListeners(new counter())
+                .addEventListeners(new org.example.Leaderboard.counter())
                 .addEventListeners(new Database())
                 .addEventListeners(new response())
                 .addEventListeners(new onRoleAdd())
@@ -43,6 +44,10 @@ public class Main {
                 .addEventListeners(new froggyIsGay())
                 .addEventListeners(new org.example.twenty_eighty.counter())
                 .addEventListeners(new org.example.twenty_eighty.response())
+                .addEventListeners(new truthAndDare())
+                .addEventListeners(new counter())
+                .addEventListeners(new org.example.captionMe.Database())
+                .addEventListeners(new org.example.captionMe.setup())
                 .build();
     }
 }

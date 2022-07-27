@@ -112,3 +112,9 @@ step one, find the reason.
  I think slow bot is database problem. I havent implemented it properly
  also I have to use more slash commands
 
+
+ have to get done:
+ truth or dare
+ ban log
+ and caption me
+

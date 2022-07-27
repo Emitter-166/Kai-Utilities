@@ -15,14 +15,16 @@ public class Help extends ListenerAdapter {
     public void onReady(ReadyEvent e){
         help = new EmbedBuilder()
                 .setTitle("Help commands for Kai Utilities")
-                .setDescription("`.l help` **Help commands for leaderboards** \n");
+                .setDescription("`.l help` **Help commands for leaderboards** \n" +
+                        "`.td help` **Help commands for truth or dare**");
         mod_help = new EmbedBuilder()
                 .setTitle("Help commands for Kai Utilities")
                 .setDescription("`.l help` **Help commands for leaderboards** \n" +
                         "`$help` **help commands for role activity logging** \n" +
                         "`.smileGiver help` **see help commands for bulk smile giver** \n" +
                         "`.stats help` **see help commands with engagement statistics monitoring system** \n" +
-                        "`.eventMonitor help` **see all the help command for event monitor feature** \n");
+                        "`.eventMonitor help` **see all the help command for event monitor feature** \n" +
+                        "`.td help` **Help commands for truth or dare**");
     }
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {
