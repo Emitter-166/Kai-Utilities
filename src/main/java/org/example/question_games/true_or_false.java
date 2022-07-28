@@ -54,15 +54,16 @@ class process implements Runnable{
         correct_answers.userIds.forEach(user -> {
             winners.append(String.format("<@%s> \n", user));
         });
+        if(winners.length() == 0){
+            winners.append("`No winners`");
+        }
         Main.jda.getTextChannelById(channelId).sendMessageEmbeds(new EmbedBuilder()
                 .setTitle("Correct answer is " + answer + "!!")
                 .setColor(Color.CYAN)
                 .setDescription("**Winners are:** \n" +
                         winners)
                 .build()).queue();
-        if(winners.length() == 0){
-            winners.append("`No winners`");
-        }
+
         Main.jda.getTextChannelById(channelId).sendMessage(winners.toString()).queue(
                 message -> message.delete().queue()
         );
@@ -70,6 +71,22 @@ class process implements Runnable{
         correct_answers.true_or_false_channel_id = "";
         correct_answers.answer = false;
         correct_answers.userIds.clear();
+
+        if(correct_answers.isRepeating){
+            Main.jda.getTextChannelById(channelId).sendMessage("**New question in 10 seconds!** do `true or false stop` to stop repeating").queue(
+                    message -> {
+                        try {
+                            Thread.sleep(10_000);
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                        message.delete();
+                        Main.jda.getTextChannelById(channelId).sendMessage("true or false").queue(
+                                starter -> starter.delete().queue()
+                        );
+                    }
+            );
+        }
     }
 }
 
@@ -84,9 +101,9 @@ public class true_or_false extends ListenerAdapter {
                 e.getChannel().sendMessageFormat("`true or false is already running on` <#%s>", correct_answers.true_or_false_channel_id).queue();
                 return;
             }
-            System.out.println("thread started");
             Thread thread = new Thread(new process(e.getChannel().getId(), e.getGuild().getId()));
             thread.start();
         }
     }
+
 }
