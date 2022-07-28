@@ -6,7 +6,9 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import org.example.Leaderboard.Database;
 import org.example.Leaderboard.response;
-import org.example.TorD.truthAndDare;
+import org.example.question_games.correct_answers;
+import org.example.question_games.true_or_false;
+import org.example.question_games.truthAndDare;
 import org.example.bulkSmileGiver.giver;
 import org.example.captionMe.counter;
 import org.example.roleLogging.Listeners.Logging.onRoleAdd;
@@ -48,6 +50,8 @@ public class Main {
                 .addEventListeners(new counter())
                 .addEventListeners(new org.example.captionMe.Database())
                 .addEventListeners(new org.example.captionMe.setup())
+                .addEventListeners(new true_or_false())
+                .addEventListeners(new correct_answers())
                 .build();
     }
 }

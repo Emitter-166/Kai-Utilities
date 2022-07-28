@@ -1,4 +1,4 @@
-package org.example.TorD;
+package org.example.question_games;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -17,7 +17,7 @@ public class truthAndDare extends ListenerAdapter {
     @Override
     public void onMessageReceived(MessageReceivedEvent e){
         try{
-            if(e.getChannel().getType().equals(ChannelType.PRIVATE) || e.getAuthor().isSystem() || e.getAuthor().isSystem()) return;
+            if(e.getChannel().getType().equals(ChannelType.PRIVATE) || e.getAuthor().isSystem()) return;
         } catch (NullPointerException exception){return;}
 
         //help cmds
@@ -27,7 +27,7 @@ public class truthAndDare extends ListenerAdapter {
                             .setTitle("Help commands for truth or dare")
                             .setColor(Color.CYAN)
                             .setDescription("`.truth` **get a truth question** \n")
-                            .appendDescription("`.dare` **get a dare task (disabled)** \n" +
+                            .appendDescription("`.dare` **get a dare task** \n" +
                                     "`.wouldyourather` **get a would you rather question** \n" +
                                     "`.paranoia` **get a paranoia question (disabled)** \n" +
                                     "`.neverhaveiever` **get a never have I ever question (disabled)** \n")
@@ -53,7 +53,6 @@ public class truthAndDare extends ListenerAdapter {
                 }
                 break;
             case ".dare":
-                if(!e.getMember().hasPermission(Permission.ADMINISTRATOR)) return;
                 try {
                     e.getMessage().replyEmbeds(new EmbedBuilder()
                                     .setTitle("Dare")
