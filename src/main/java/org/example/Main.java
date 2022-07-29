@@ -26,7 +26,7 @@ public class Main {
     public static JDA jda;
 
     public static void main(String[] args) throws LoginException {
-        jda = JDABuilder.createLight(token.getToken()) //token will go here
+        jda = JDABuilder.createLight(token.getTest_token()) //token will go here
                 .addEventListeners(new Help())
                 .addEventListeners(new EventMonitor())
                 .addEventListeners(new EventMonitorCounter())
