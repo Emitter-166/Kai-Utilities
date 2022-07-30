@@ -1,5 +1,6 @@
 package org.example.captionMe;
 
+import com.mongodb.client.model.Filters;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.ChannelType;
@@ -8,7 +9,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.bson.Document;
 
 import java.awt.*;
-import java.util.Arrays;
 import java.util.Locale;
 
 public class setup extends ListenerAdapter {
@@ -25,12 +25,10 @@ public class setup extends ListenerAdapter {
             case "help":
                 e.getMessage().replyEmbeds(new EmbedBuilder()
                                 .setTitle("Help commands for advertiser")
-                                .setDescription("`.advertiser add <#channelMention> <repeat_duration> <ad_name>  <image_url:text> ` **Inserts a new ad**")
-                                .appendDescription("`.advertiser edit <ad_name> <field_name> <value>` **Edit a specific field of an ad** \n")
-                                .appendDescription("`.advertiser remove <ad_name>` **remove an ad** \n")
+                                .setDescription("`.advertiser add #channelMention <repeat_duration> <ad_name>  <image_url:text> ` **Inserts a new ad** \n")
+                                .appendDescription("`.advertiser remove ad_name` **remove an ad** \n")
                                 .appendDescription("`.advertiser ads` **See all current ads** \n")
-                                .appendDescription("`.advertiser adInfo <ad_name>` **see info about a current ad** \n")
-                                .appendDescription("`.advertiser showAd <ad_name>` **see the ad example** \n")
+                                .appendDescription("`.advertiser adInfo ad_name` **see info about a current ad** \n")
                                 .addField("**Command description**", "" +
                                                 "       \n" +
                                                 "**Adding new Ad** \n" +
@@ -60,18 +58,16 @@ public class setup extends ListenerAdapter {
                                     message.delete().queue();
                                 }
                         );
-                String[] values = null;
-                Long duration_milliseconds = null;
-                String ad_name = null;
+                String[] values;
+                long duration_milliseconds;
+                StringBuilder ad_name;
                 String content = null;
                 String channelId = null;
                 try {
                     values = e.getMessage().getContentRaw().replace(">", "").split("<");
-                    System.out.println("values: " + Arrays.toString(values));
-                    System.out.println("raw: " + e.getMessage().getContentRaw());
                     channelId = values[1].replace("#", "");
                     duration_milliseconds = Long.parseLong(values[2].replace(" ", "")) * 60_000L;
-                    ad_name = values[3];
+                    ad_name = new StringBuilder(values[3]).delete(values[3].length() - 2, values[3].length());
                     content = values[4];
 
                 } catch (IndexOutOfBoundsException exception) {
@@ -89,10 +85,10 @@ public class setup extends ListenerAdapter {
                     return;
                 }
                 try {
-                    Database.set(e.getGuild().getId(), "serverId", "adIds",  " " + ad_name, true);
-                    Database.set(ad_name, "adId", "channel", channelId, false);
-                    Database.set(ad_name, "adId", "text", content, false);
-                    Database.set(ad_name, "adId", "repeat_every", duration_milliseconds, false);
+                    Database.set(e.getGuild().getId(), "serverId", "adIds",   ad_name +", " , true);
+                    Database.set(ad_name.toString(), "adId", "channel", channelId, false);
+                    Database.set(ad_name.toString(), "adId", "text", content, false);
+                    Database.set(ad_name.toString(), "adId", "repeat_every", duration_milliseconds, false);
 
                 } catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
@@ -102,7 +98,7 @@ public class setup extends ListenerAdapter {
 
             case "ads":
                 StringBuilder result = new StringBuilder();
-                String[] ad_names = null;
+                String[] ad_names;
                 try {
                    ad_names = Database.get(e.getGuild().getId(), "serverId").get("adIds").toString().split(", ");
                 } catch (InterruptedException ex) {
@@ -125,11 +121,11 @@ public class setup extends ListenerAdapter {
                 }
 
                 try {
-                    doc = Database.get(adName.toString(), "adId");
+                    doc = Database.get(new StringBuilder(adName).deleteCharAt(adName.length() - 1).toString(), "adId");
                 } catch (InterruptedException ex) {
                     throw new RuntimeException(ex);
                 }
-                String channel = "<#" + doc.get("channel").toString() + ">";
+                String channel = "<#" + doc.get("channel").toString().replace(" ", "") + ">";
                 String content_info = doc.get("text").toString();
                 String repeating_time_in_minutes = String.valueOf((Long.parseLong(doc.get("repeat_every").toString()) / 60_000));
                 String last_sent = String.valueOf((Long.parseLong(doc.get("last_sent_on").toString()) / 60_000));
@@ -141,14 +137,36 @@ public class setup extends ListenerAdapter {
                                 .setDescription(String.format("**Ad name:** `%s` \n", adName))
                                 .appendDescription(String.format("**Ad channel:** %s \n", channel))
                                 .appendDescription(String.format("**Repeat every:** `%s minutes` \n", repeating_time_in_minutes))
-                                .appendDescription(String.format("**Last sent:** `%s minutes ago`", last_sent))
+                                .appendDescription(String.format("**Last sent:** `%s minutes ago` \n", last_sent))
                                 .appendDescription(String.format("**Ad content:** `%s`", content_info))
                                 .setColor(Color.WHITE)
 
                         .build()).mentionRepliedUser(false).queue();
                 break;
 
-
+            case "remove":
+                String ad_name_to_remove = "";
+                for(int i = 2; i < args.length; i++){
+                    ad_name_to_remove += args[i] + " ";
+                }
+                e.getMessage().reply(String.format("`Deleting %s...`", ad_name_to_remove)).mentionRepliedUser(false).queue(
+                        message -> {
+                            try {
+                                Thread.sleep(2000);
+                            } catch (InterruptedException ex) {
+                                throw new RuntimeException(ex);
+                            }
+                            message.delete().queue();
+                        }
+                );
+                try {
+                    Database.set(e.getGuild().getId(), "serverId", "adIds", Database.get(e.getGuild().getId(), "serverId").get("adIds").toString().replace(new StringBuilder(ad_name_to_remove).deleteCharAt(ad_name_to_remove.length() -1) + ", ", ""), false);
+                    Database.collection.deleteOne(Filters.eq("adId", new StringBuilder(ad_name_to_remove).deleteCharAt(ad_name_to_remove.length() -1).toString()));
+                    e.getMessage().reply("`Successfully removed " + ad_name_to_remove + "`").mentionRepliedUser(false).queue();
+                } catch (InterruptedException ex) {
+                    throw new RuntimeException(ex);
+                }
+                break;
         }
     }
 }

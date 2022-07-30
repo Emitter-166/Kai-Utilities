@@ -36,7 +36,6 @@ public class Database extends ListenerAdapter {
     }
 
     private static void createDB(String Id) {
-        System.out.println(Id);
         //server config, here is the template used to make new settings document on db collection
         Document document = new Document("serverId", Id)
                 .append("adIds", "");
