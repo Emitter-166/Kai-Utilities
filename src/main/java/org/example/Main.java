@@ -12,6 +12,7 @@ import org.example.question_games.true_or_false;
 import org.example.question_games.truthAndDare;
 import org.example.bulkSmileGiver.giver;
 import org.example.captionMe.counter;
+import org.example.roleLogging.Listeners.Logging.onBan;
 import org.example.roleLogging.Listeners.Logging.onRoleAdd;
 import org.example.roleLogging.Listeners.Logging.onRoleRemove;
 import org.example.roleLogging.setup;
@@ -27,7 +28,7 @@ public class Main {
     public static JDA jda;
 
     public static void main(String[] args) throws LoginException {
-        jda = JDABuilder.createLight(token.getTest_token()) //token will go here
+        jda = JDABuilder.createLight(token.getToken()) //token will go here
                 .addEventListeners(new Help())
                 .addEventListeners(new EventMonitor())
                 .addEventListeners(new EventMonitorCounter())
@@ -54,6 +55,7 @@ public class Main {
                 .addEventListeners(new true_or_false())
                 .addEventListeners(new correct_answers())
                 .addEventListeners(new autoRoleRemover())
+                .addEventListeners(new onBan())
                 .build();
     }
 }
