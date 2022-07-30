@@ -25,7 +25,7 @@ public class Help extends ListenerAdapter {
                         "`.stats help` **see help commands with engagement statistics monitoring system** \n" +
                         "`.eventMonitor help` **see all the help command for event monitor feature** \n" +
                         "`.td help` **Help commands for truth or dare** \n" +
-                        "**`true or false help` **Help commands for truth or false**");
+                        "`true or false help` **Help commands for true or false**");
     }
     @Override
     public void onMessageReceived(MessageReceivedEvent e) {

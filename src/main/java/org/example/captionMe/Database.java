@@ -36,9 +36,9 @@ public class Database extends ListenerAdapter {
     }
 
     private static void createDB(String Id) {
+        System.out.println(Id);
         //server config, here is the template used to make new settings document on db collection
         Document document = new Document("serverId", Id)
-                .append("serverId", "")
                 .append("adIds", "");
 
         collection.insertOne(document);
@@ -47,12 +47,9 @@ public class Database extends ListenerAdapter {
 
     private static void createAdDB(String Id) {
         //server config, here is the template used to make new settings document on db collection
-        Document document = new Document("serverId", Id)
-                .append("adId", Id) //ad_name
-                .append("adType", "") //image, text, text_image, API
-                .append("channels", "")
+        Document document = new Document("adId", Id)//ad_name
+                .append("channel", "")
                 .append("text", "")
-                .append("embed_urls", "")
                 .append("repeat_every", 0L)
                 .append("last_sent_on", 0L);
 
@@ -73,6 +70,7 @@ public class Database extends ListenerAdapter {
             }else if(field.equalsIgnoreCase("adId")){
                 createAdDB(Id);
             }
+            Thread.sleep(200);
             document = collection.find(new Document(field, Id)).cursor().next();
         }
 
