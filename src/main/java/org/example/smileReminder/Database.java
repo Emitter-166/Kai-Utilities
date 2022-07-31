@@ -1,4 +1,4 @@
-package org.example.captionMe;
+package org.example.smileReminder;
 
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
@@ -28,8 +28,8 @@ public class Database extends ListenerAdapter {
         } catch (NoSuchElementException exception) {
             if (field.equalsIgnoreCase("serverId")) {
                 createDB(Id);
-            }else if(field.equalsIgnoreCase("adId")){
-                createAdDB(Id);
+            }else if(field.equalsIgnoreCase("userId")){
+                createUserDB(Id);
             }
             return collection.find(new Document(field, Id)).cursor().next();
         }
@@ -39,20 +39,18 @@ public class Database extends ListenerAdapter {
     private static void createDB(String Id) {
         //server config, here is the template used to make new settings document on db collection
         Document document = new Document("serverId", Id)
-                .append("adIds", "");
+                .append("users", "");
 
         collection.insertOne(document);
 
     }
 
-    private static void createAdDB(String Id) {
+    private static void createUserDB(String Id) {
         //server config, here is the template used to make new settings document on db collection
-        Document document = new Document("adId", Id)//ad_name
-                .append("channel", "")
-                .append("text", "")
-                .append("repeat_every", 0L)
-                .append("last_sent_on", 0L);
-
+        Document document = new Document("userId", Id)//ad_name
+                .append("channelId", "")
+                .append("wish", 0L)
+                .append("work", 0L);
         collection.insertOne(document);
 
     }
@@ -67,30 +65,30 @@ public class Database extends ListenerAdapter {
         } catch (NoSuchElementException exception) {
             if (field.equalsIgnoreCase("serverId")) {
                 createDB(Id);
-            }else if(field.equalsIgnoreCase("adId")){
-                createAdDB(Id);
+            }else if(field.equalsIgnoreCase("userId")){
+                createUserDB(Id);
             }
             Thread.sleep(200);
             document = collection.find(Filters.eq(field, Id)).cursor().next();
         }
 
         if (!isAdd) {
-                //it will check if the values should be added with the previous value
-                Document Updatedocument = new Document(key, value);
-                Bson updateKey = new Document("$set", Updatedocument);
-                collection.updateOne(document, updateKey);
-            } else {
-                Document Updatedocument = null;
-                if (value.getClass().getSimpleName().equalsIgnoreCase("Integer")) {
-                    Updatedocument = new Document(key, ((int) document.get(key) + (int) value));
-                } else if(value.getClass().getSimpleName().equalsIgnoreCase("String")){
-                    Updatedocument = new Document(key, (document.get(key) + (String) value));
-                }else if(value.getClass().getSimpleName().equalsIgnoreCase("Long")){
-                    Updatedocument = new Document(key, ((long)document.get(key) + (long) value));
-                }
-                Bson updateKey = new Document("$set", Updatedocument);
-                collection.updateOne(document, updateKey);
+            //it will check if the values should be added with the previous value
+            Document Updatedocument = new Document(key, value);
+            Bson updateKey = new Document("$set", Updatedocument);
+            collection.updateOne(document, updateKey);
+        } else {
+            Document Updatedocument = null;
+            if (value.getClass().getSimpleName().equalsIgnoreCase("Integer")) {
+                Updatedocument = new Document(key, ((int) document.get(key) + (int) value));
+            } else if(value.getClass().getSimpleName().equalsIgnoreCase("String")){
+                Updatedocument = new Document(key, (document.get(key) + (String) value));
+            }else if(value.getClass().getSimpleName().equalsIgnoreCase("Long")){
+                Updatedocument = new Document(key, ((long)document.get(key) + (long) value));
             }
+            Bson updateKey = new Document("$set", Updatedocument);
+            collection.updateOne(document, updateKey);
+        }
     }
     @Override
     public void onReady (ReadyEvent e){
@@ -98,8 +96,8 @@ public class Database extends ListenerAdapter {
         String uri = token.getUri(); //Mongo DB uri
         MongoClientURI clientURI = new MongoClientURI(uri);
         MongoClient client = new MongoClient(clientURI);
-        MongoDatabase database = client.getDatabase("advertisements"); //getting database and collection
-        collection = database.getCollection("advertisements");
+        MongoDatabase database = client.getDatabase("smileReminder"); //getting database and collection
+        collection = database.getCollection("smileReminder");
 
     }
 }

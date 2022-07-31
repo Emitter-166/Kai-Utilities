@@ -17,6 +17,7 @@ public class counter extends ListenerAdapter {
         if(counter > 50){
             counter = 0;
             sendAds(e.getGuild().getId());
+
         }
     }
 

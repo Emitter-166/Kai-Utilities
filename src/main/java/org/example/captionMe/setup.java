@@ -68,7 +68,9 @@ public class setup extends ListenerAdapter {
                     channelId = values[1].replace("#", "");
                     duration_milliseconds = Long.parseLong(values[2].replace(" ", "")) * 60_000L;
                     ad_name = new StringBuilder(values[3]).delete(values[3].length() - 1, values[3].length());
-                    ad_name.deleteCharAt(ad_name.length() - 1);
+                    if(ad_name.toString().charAt(ad_name.length() -1) == ' '){
+                        ad_name.deleteCharAt(ad_name.length() - 1);
+                    }
                     content = values[4];
 
 

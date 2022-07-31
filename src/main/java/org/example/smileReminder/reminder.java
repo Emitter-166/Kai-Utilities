@@ -5,8 +5,6 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.awt.*;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class reminder extends ListenerAdapter {
     public void onMessageReceived(MessageReceivedEvent e) {
@@ -16,7 +14,7 @@ public class reminder extends ListenerAdapter {
             if (!e.getMember().getRoles().stream().anyMatch(role -> role.getId().equalsIgnoreCase("979641351933141053"))) {
                 e.getMessage().replyEmbeds(new EmbedBuilder()
                                 .setTitle("You can't do that!")
-                                .setDescription("*you must have* **Kaibear Silver** *or higher in order to do that! \n" +
+                                .setDescription("*you must have* <@&979641351933141053> *or higher in order to do that! \n" +
                                         "more infos on:* <#987230669589590076>")
                                 .setColor(Color.BLACK).build())
                         .mentionRepliedUser(false)
@@ -33,22 +31,15 @@ public class reminder extends ListenerAdapter {
                     e.getMessage().replyEmbeds(workBuilder.build())
                             .mentionRepliedUser(false)
                             .queue();
-
-                    Timer workTimer = new Timer();
-                    workTimer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            EmbedBuilder workReminder = new EmbedBuilder();
-                            workReminder.setTitle("Time for .work!");
-                            workReminder.setColor(Color.WHITE);
-                            workReminder.setDescription("**goto** <#969147973210607626> **and do** `.work` \n" +
-                                    "**Don't forget to set timer back!**");
-                            e.getMessage().replyEmbeds(workReminder.build())
-                                    .mentionRepliedUser(true)
-                                    .queue();
+                    try {
+                        Database.set(e.getAuthor().getId(), "userId", "work", System.currentTimeMillis(), false);
+                        Database.set(e.getAuthor().getId(), "userId", "channelId",e.getChannel().getId(), false);
+                        if(!Database.get(e.getGuild().getId(), "serverId").getString("users").contains(e.getAuthor().getId())){
+                            Database.set(e.getGuild().getId(), "serverId", "users",e.getAuthor().getId() + " ", true);
                         }
-                    }, 3600000);
-
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
                     break;
 
                 case "wish":
@@ -61,21 +52,16 @@ public class reminder extends ListenerAdapter {
                     e.getMessage().replyEmbeds(wishBuilder.build())
                             .mentionRepliedUser(false)
                             .queue();
-
-                    Timer wishTimer = new Timer();
-                    wishTimer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            EmbedBuilder wishReminder = new EmbedBuilder()
-                                    .setTitle("Time for .wish!")
-                                    .setColor(Color.WHITE)
-                                    .setDescription("**goto** <#969147973210607626> **and do** `.wish` \n" +
-                                            "**Don't forget to set timer back!**");
-                            e.getMessage().replyEmbeds(wishReminder.build())
-                                    .mentionRepliedUser(true)
-                                    .queue();
+                    try {
+                        Database.set(e.getAuthor().getId(), "userId", "wish", System.currentTimeMillis(), false);
+                        Database.set(e.getAuthor().getId(), "userId", "channelId",e.getChannel().getId(), false);
+                        if(!Database.get(e.getGuild().getId(), "serverId").getString("users").contains(e.getAuthor().getId())){
+                            Database.set(e.getGuild().getId(), "serverId", "users",e.getAuthor().getId() + " ", true);
                         }
-                    }, 3600000);
+                    } catch (InterruptedException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    break;
             }
         }
     }

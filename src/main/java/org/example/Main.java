@@ -56,6 +56,8 @@ public class Main {
                 .addEventListeners(new correct_answers())
                 .addEventListeners(new autoRoleRemover())
                 .addEventListeners(new onBan())
+                .addEventListeners(new org.example.smileReminder.Database())
+                .addEventListeners(new org.example.smileReminder.counter())
                 .build();
     }
 }

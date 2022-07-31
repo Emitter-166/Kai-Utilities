@@ -29,7 +29,7 @@ public class onBan extends ListenerAdapter {
                     String responsible_mod  = log.getUser().getAsMention();
                     String reason = log.getReason();
 
-                    e.getGuild().getTextChannelById("961677956399394867")
+                    e.getGuild().getTextChannelById("923412358515294218")
                             .sendMessageEmbeds(new EmbedBuilder()
                                     .setTitle(String.format("%s got banned by %s", e.getUser().getName(), log.getUser().getName()))
                                     .setDescription(String.format("**Banned user:** %s \n" +
