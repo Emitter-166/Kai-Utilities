@@ -17,7 +17,6 @@ import org.example.roleLogging.Listeners.Logging.onRoleAdd;
 import org.example.roleLogging.Listeners.Logging.onRoleRemove;
 import org.example.roleLogging.setup;
 import org.example.smileReminder.ad;
-import org.example.smileReminder.froggyIsGay;
 import org.example.smileReminder.reminder;
 import org.example.twenty_eighty.EventMonitoring.EventMonitor;
 import org.example.twenty_eighty.EventMonitoring.EventMonitorCounter;
@@ -45,7 +44,6 @@ public class Main {
                 .addEventListeners(new giver())
                 .addEventListeners(new ad())
                 .addEventListeners(new reminder())
-                .addEventListeners(new froggyIsGay())
                 .addEventListeners(new org.example.twenty_eighty.counter())
                 .addEventListeners(new org.example.twenty_eighty.response())
                 .addEventListeners(new truthAndDare())
